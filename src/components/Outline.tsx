@@ -21,8 +21,20 @@ export default function Outline({ content, theme = 'dark', onHeadingClick, isVis
     // 提取所有标题
     const lines = content.split('\n')
     const extractedHeadings: HeadingItem[] = []
+    let inCodeBlock = false
 
     lines.forEach((line, index) => {
+      // 检查是否进入或退出代码块
+      if (line.trim().startsWith('```')) {
+        inCodeBlock = !inCodeBlock
+        return
+      }
+
+      // 如果在代码块内，跳过
+      if (inCodeBlock) {
+        return
+      }
+
       // 匹配 Markdown 标题格式 (# 到 ######)
       const match = line.match(/^(#{1,6})\s+(.+)/)
       if (match) {
