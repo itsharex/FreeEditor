@@ -722,7 +722,8 @@ ${html.replace(
       }
 
       // 替换所有 hljs 相关的类名为内联样式
-      styledHtml = styledHtml.replace(/<span class="([^"]*hljs[^"]*)"([^>]*)>/g, (match, classNames, attrs) => {
+      // 同时将 span 标签后的空格移到标签内,防止微信公众号吞掉空格
+      styledHtml = styledHtml.replace(/<span class="([^"]*hljs[^"]*)"([^>]*)>(.*?)<\/span>(\s*)/g, (match, classNames, attrs, content, trailingSpace) => {
         const classes = classNames.split(' ').filter((c: string) => c.trim())
         let styles = ''
 
@@ -733,15 +734,43 @@ ${html.replace(
           }
         }
 
+        // 将尾随空格移到 span 标签内,防止被微信公众号删除
+        const contentWithSpace = content + trailingSpace
+
         // 如果有样式，替换为 style 属性；否则移除 class
         if (styles.trim()) {
-          return `<span style="${styles.trim()}"${attrs}>`
+          return `<span style="${styles.trim()}"${attrs}>${contentWithSpace}</span>`
         }
-        return `<span${attrs}>`
+        return `<span${attrs}>${contentWithSpace}</span>`
       })
 
       // 移除 code 标签上的 hljs 类名，保留 language-* 类（可能有用）
       styledHtml = styledHtml.replace(/<code class="hljs language-(\w+)"/g, '<code')
+
+      // 额外处理：确保代码块中的空格不会丢失
+      // 微信公众号可能会压缩或删除某些空格，特别是在标签之间的空格
+      styledHtml = styledHtml.replace(/<pre([^>]*)>([\s\S]*?)<\/pre>/g, (match, preAttrs, preContent) => {
+        // 智能替换空格：只替换文本中的空格，不替换HTML标签内的空格
+        let processedContent = preContent
+
+        // 临时标记所有HTML标签，避免标签内的空格被替换
+        const tagPlaceholders: string[] = []
+        processedContent = processedContent.replace(/<[^>]+>/g, (tag) => {
+          const placeholder = `___TAG_${tagPlaceholders.length}___`
+          tagPlaceholders.push(tag)
+          return placeholder
+        })
+
+        // 现在可以安全地替换文本中的空格为 &nbsp;
+        processedContent = processedContent.replace(/ /g, '&nbsp;')
+
+        // 恢复HTML标签
+        tagPlaceholders.forEach((tag, index) => {
+          processedContent = processedContent.replace(`___TAG_${index}___`, tag)
+        })
+
+        return `<pre${preAttrs}>${processedContent}</pre>`
+      })
 
       // 处理 KaTeX 公式：将 class 样式转换为内联样式
       // 微信公众号不支持外部 CSS，需要内联化样式
