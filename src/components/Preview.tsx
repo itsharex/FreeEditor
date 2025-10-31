@@ -620,7 +620,7 @@ ${html.replace(
     return `<code style="${adjustStyleForTheme(customStyles.code).replace(/font-size: \d+px/, `font-size: ${codeSize}px`)}">`
   }
 ).replace(
-  /<pre>/g, `<pre style="${adjustStyleForTheme(customStyles.pre)}">`
+  /<pre>/g, `<pre style="${adjustStyleForTheme(customStyles.pre)}; text-align: left;">`
 ).replace(
   /<blockquote>/g, `<blockquote style="${adjustStyleForTheme(customStyles.blockquote)}">`
 ).replace(
@@ -769,7 +769,17 @@ ${html.replace(
           processedContent = processedContent.replace(`___TAG_${index}___`, tag)
         })
 
-        return `<pre${preAttrs}>${processedContent}</pre>`
+        // 确保 preAttrs 中包含 text-align: left
+        let attrs = preAttrs
+        if (!attrs.includes('text-align')) {
+          if (attrs.includes('style=')) {
+            attrs = attrs.replace(/style="([^"]*)"/, 'style="$1; text-align: left; white-space: pre;"')
+          } else {
+            attrs += ' style="text-align: left; white-space: pre;"'
+          }
+        }
+
+        return `<pre${attrs}>${processedContent}</pre>`
       })
 
       // 处理 KaTeX 公式：将 class 样式转换为内联样式
