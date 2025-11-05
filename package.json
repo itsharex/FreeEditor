@@ -8,7 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"node electron/wait-and-start.js\"",
-    "electron:build": "cross-env ELECTRON=true vite build && electron-builder"
+    "electron:build": "cross-env ELECTRON=true vite build && electron-builder",
+    "electron:build:mac": "cross-env ELECTRON=true vite build && electron-builder --mac",
+    "electron:build:mac:arm64": "cross-env ELECTRON=true vite build && electron-builder --mac --arm64",
+    "electron:build:mac:x64": "cross-env ELECTRON=true vite build && electron-builder --mac --x64",
+    "electron:build:mac:universal": "cross-env ELECTRON=true vite build && electron-builder --mac --universal"
   },
   "keywords": [],
   "author": "",
@@ -22,8 +26,52 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "public/logo.ico"
+      "public/logo.ico",
+      "!node_modules/**/@esbuild/**"
     ],
+    "asarUnpack": [],
+    "npmRebuild": false,
+    "mac": {
+      "icon": "public/logo.icns",
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": true
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
     "win": {
       "icon": "public/logo.ico",
       "target": [
@@ -53,12 +101,14 @@
     "vite": "^7.1.7"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.1.1",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^38.2.1",
     "electron-builder": "^26.0.12",
+    "esbuild": "^0.25.12",
     "typescript": "^5.9.3",
     "wait-on": "^9.0.1"
   }
