@@ -12,9 +12,11 @@
 
 一款简洁的双栏 Markdown 编辑器，支持实时预览和微信公众号样式导出。
 
- 在线使用：https://xdxsb.top/FreeEditor
+在线使用：https://xdxsb.top/FreeEditor
 
 windows下载：https://github.com/zstar1003/FreeEditor/releases/download/v1.0.0/FreeEditor.Setup.1.0.0.exe
+
+mac下载：https://github.com/zstar1003/FreeEditor/releases/download/v1.0.0/FreeEditor-1.0.0-arm64.dmg
 
 ## ✨ 特性
 

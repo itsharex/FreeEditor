@@ -1,159 +1,142 @@
 <div align="center">
-  <img src="assets\ai_logo.jpeg"  alt="LOGO">
+  <img src="assets\ai_logo.jpeg" alt="LOGO">
 </div>
 
 <div align="center">
   <h4>
-    <a href="README.md">🇨🇳 中文</a>
+    <a href="README.md">🇨🇳 Chinese</a>
     <span> | </span>
     <a href="README_EN.md">🇬🇧 English</a>
   </h4>
 </div>
 
-A clean dual-pane Markdown editor with real-time preview and WeChat Official Account style export.
+A simple two-column Markdown editor that supports real-time preview and WeChat official account style export.
 
-You can access it online at https://xdxsb.top/FreeEditor
+Online use: https://xdxsb.top/FreeEditor
 
-windows download：https://github.com/zstar1003/FreeEditor/releases/download/v1.0.0/FreeEditor.Setup.1.0.0.exe
+windows download: https://github.com/zstar1003/FreeEditor/releases/download/v1.0.0/FreeEditor.Setup.1.0.0.exe
+
+mac download: https://github.com/zstar1003/FreeEditor/releases/download/v1.0.0/FreeEditor-1.0.0-arm64.dmg
 
 ## ✨ Features
 
-- 📝 **Real-time Preview** - Live preview with WYSIWYG experience
-- 🎨 **Rich Style Library** - Built-in beautiful styles for headings, code, and blockquotes
-- 📱 **Mobile Preview** - Phone view preview, optimized for WeChat Official Accounts
-- 📋 **One-Click Copy** - Copy rich text directly to WeChat editor
-- 🌓 **Theme Switching** - Dark/Light theme support
-- 📂 **Folder Management** - Organize documents with folders, drag-and-drop files
-- 🖼️ **Image Upload** - Drag/paste to upload images to Alibaba Cloud OSS
-- ⌨️ **Keyboard Shortcuts** - Rich editing shortcuts for efficiency
-- 🔄 **Undo/Redo** - Edit history support with Ctrl+Z
-- ✏️ **Formatting Toolbar** - Quick text formatting on selection
-- 💾 **Local Storage** - Auto-save with local data storage
-- 🔧 **Backup & Restore** - Data export and import support
-- 🖥️ **Electron Support** - Package as desktop application
+- 📝 **Real-time preview** - Look while writing, what you see is what you get
+- 🎨 **Rich Style Library** - Built-in multiple exquisite title, code, and quote block styles
+- 📱 **Mobile preview** - Supports mobile phone view preview and adapts to WeChat public accounts
+- 📋 **One-click copy** - Copy rich text directly and paste it into the WeChat official account editor
+- 🌓 **Theme Switch** - Support dark/light theme
+- 📂 **Folder Management** - Supports folder classification management documents, drag and drop to move files
+- 🖼️ **Image Upload** - Supports dragging/pasting to upload images to Alibaba Cloud OSS
+- ⌨️ **Shortcut key support** - Rich editing shortcut keys to improve editing efficiency
+- 🔄 **Undo/Redo** - Supports editing history, Ctrl+Z to undo operations
+- ✏️ **Formatting Toolbar** - Select text to quickly format it
+- 💾 **Local Storage** - Automatically save, data is stored locally
+- 🔧 **Backup and Restore** - Supports data export and import
+- 🖥️ **Electron support** - can be packaged into desktop applications
 
 ## 🚀 Quick Start
 
-### Install Dependencies
+### Install dependencies
 
 ```bash
 npm install
 ```
 
-### Development Mode
+### Development mode
 
 ```bash
-# Web Development
-npm run dev
+#webdevelopment
+npm rundev
 
-# Electron Development
+#ElectronDevelopment
 npm run electron:dev
 ```
 
 ### Build
 
 ```bash
-# Web Build
+#Web build
 npm run build
 
-# Electron Build
+# Electron build
 npm run electron:build
 ```
 
-## 📖 Features Guide
+## 📖 Function description
 
-### Keyboard Shortcuts
+### Shortcut keys
 
-The editor supports the following shortcuts:
+The editor supports the following shortcut keys:
 
 - **Ctrl+B** / **Cmd+B** - Bold selected text
-- **Ctrl+I** / **Cmd+I** - Italicize selected text
+- **Ctrl+I** / **Cmd+I** - italicize selected text
 - **Ctrl+U** / **Cmd+U** - Underline selected text
-- **Ctrl+Z** / **Cmd+Z** - Undo last operation
+- **Ctrl+Z** / **Cmd+Z** - Undo the previous operation
 - **Ctrl+Shift+Z** / **Cmd+Shift+Z** - Redo
-- **Ctrl+Y** / **Cmd+Y** - Redo (Windows style)
-- **Tab** - Insert indentation
+- **Ctrl+Y** / **Cmd+Y** - Redo
+- **Tab** - insert indent
 
-### Floating Formatting Toolbar
-
-When text is selected, a formatting toolbar appears with:
-
-- **B** - Bold (**text**)
-- **I** - Italic (*text*)
-- **U** - Underline (`<u>`text`</u>`)
-- **S** - Strikethrough (~~text~~)
-
-### Style Customization
-
-Customize styles for:
-
-- **Headings** - Multiple styles for H1/H2/H3
-- **Code** - Inline code and code block styles
-- **Blockquotes** - Various quote styles
-- **Fonts** - Font family and size settings
-- **Alignment** - Left/Center/Right/Justify alignment
-
-### Image Upload
+### Image upload
 
 After configuring Alibaba Cloud OSS, you can:
 
-1. Paste images directly into the editor
-2. Drag images into the editor
-3. Auto-upload and insert Markdown image syntax
+1. Paste the image directly into the editor
+2. Drag the image to the editor
+3. Automatically upload and insert Markdown image syntax
 
-Configure OSS in settings:
+Configure OSS information in settings:
 
 - Region
 - AccessKey ID
-- AccessKey Secret
-- Bucket
+-AccessKey Secret
+- Bucket (storage space)
 
-### File Management
+### File management
 
-- Create folders to organize documents
-- Drag files into folders
-- Right-click on files/folders: Rename, Download, Delete
-- Right-click on blank area: New File, New Folder
-- Auto-save to local storage
-- Download files and folders (folders export as ZIP)
+- Create folder classification management documents
+- Drag files to folders
+- Right click on the file/folder: rename, download, delete
+- Right click on the blank area: create new file, create new folder
+- Automatically save to local storage
+- Support file and folder download (folder export as ZIP)
 
-### Export to WeChat Official Account
+### Export to WeChat official account
 
-1. Select appropriate styles in preview area
-2. Click copy button
-3. Paste into WeChat Official Account editor
+1. Select the appropriate style in the preview area
+2. Click the Copy button
+3. Paste into WeChat public account editor
 
-## 🛠️ Tech Stack
+## 🛠️ Technology stack
 
-- **React 19** - UI Framework
-- **TypeScript** - Type Safety
-- **Vite** - Build Tool
-- **Marked** - Markdown Parser
-- **Electron** - Desktop Application
-- **Alibaba Cloud OSS** - Image Storage
+- **React 19** - UI framework
+- **TypeScript** - type safety
+- **Vite** - Build tool
+- **Marked** - Markdown parsing
+- **Electron** - desktop application
+- **Alibaba Cloud OSS** - Image storage
 
-## 📝 Development Guide
+## 📝 Development Instructions
 
-### Project Structure
+### Project structure
 
 ```
 md_editor/
 ├── src/
-│   ├── components/     # Components
-│   │   ├── Editor.tsx      # Editor
-│   │   ├── Preview.tsx     # Preview
-│   │   ├── Sidebar.tsx     # Sidebar
-│   │   ├── Settings.tsx    # Settings
-│   │   └── Modal.tsx       # Modal
-│   ├── styles/        # Styles
-│   │   └── themes.ts       # Style Library
-│   ├── utils/         # Utilities
-│   │   └── ossUpload.ts    # OSS Upload
-│   ├── types/         # Type Definitions
-│   ├── App.tsx        # Main App
-│   └── main.tsx       # Entry
-├── electron/          # Electron Config
-├── public/            # Static Assets
+│ ├── components/ # Components
+│ │ ├── Editor.tsx # Editor
+│ │ ├── Preview.tsx # Preview area
+│ │ ├── Sidebar.tsx # Sidebar
+│ │ ├── Settings.tsx # Settings
+│ │ └── Modal.tsx # Modal box
+│ ├── styles/ # style
+│ │ └── themes.ts # style library
+│ ├── utils/ # Tools
+│ │ └── ossUpload.ts # OSS upload
+│ ├── types/ # Type definition
+│ ├── App.tsx # Main application
+│ └── main.tsx # Entrance
+├── electron/ # Electron configuration
+├── public/ # Static resources
 └── package.json
 ```
 
@@ -161,6 +144,6 @@ md_editor/
 
 MIT
 
-## 🤝 Contributing
+## 🤝 Contribute
 
 Issues and Pull Requests are welcome!
