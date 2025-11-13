@@ -668,7 +668,20 @@ ${html.replace(
         return `<code style="${adjustStyleForTheme(customStyles.code).replace(/font-size: \d+px/, `font-size: ${codeSize}px`)}">`
       }
     ).replace(
-      /<pre>/g, `<pre style="${adjustStyleForTheme(customStyles.pre)}">`
+      /<pre>/g, () => {
+        // 从 customStyles.pre 中提取字体大小,如果没有则默认为 14px
+        const preStyle = customStyles.pre
+        const fontSizeMatch = preStyle.match(/font-size:\s*(\d+)px/)
+        const preFontSize = fontSizeMatch ? fontSizeMatch[1] : '14'
+
+        // 如果样式中已有 font-size,保持不变;否则添加默认的 14px
+        let finalPreStyle = adjustStyleForTheme(preStyle)
+        if (!finalPreStyle.includes('font-size:')) {
+          finalPreStyle += `; font-size: ${preFontSize}px`
+        }
+
+        return `<pre style="${finalPreStyle}">`
+      }
     ).replace(
       /<blockquote>/g, `<blockquote style="${adjustStyleForTheme(customStyles.blockquote)}">`
     ).replace(

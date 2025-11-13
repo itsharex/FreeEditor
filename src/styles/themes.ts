@@ -136,17 +136,17 @@ export const codeStyles: ElementStyle[] = [
 
 // 代码块样式库
 export const preStyles: ElementStyle[] = [
-  { id: 'pre-leftbar-green', name: '绿色左边框', style: 'background: #f6f8fa; padding: 12px; border-radius: 6px; overflow-x: auto; margin-bottom: 14px; border-left: 3px solid #07c160;' },
-  { id: 'pre-simple-gray', name: '简约灰色', style: 'background: #f6f6f6; padding: 16px; border-radius: 4px; overflow-x: auto; margin-bottom: 16px;' },
-  { id: 'pre-border', name: '边框样式', style: 'background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #e1e4e8;' },
-  { id: 'pre-dark', name: '深色主题', style: 'background: #2d2d2d; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; color: #f8f8f2;' },
-  { id: 'pre-mac', name: 'Mac窗口', style: 'background: #1e1e1e; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: #f8f8f2;' },
-  { id: 'pre-mac-dark', name: 'Mac深色', style: 'background: #282c34; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); color: #abb2bf;' },
-  { id: 'pre-gradient', name: '渐变背景', style: 'background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #667eea30;' },
-  { id: 'pre-terminal', name: '终端样式', style: 'background: #0c0c0c; padding: 16px; border-radius: 4px; overflow-x: auto; margin-bottom: 16px; color: #00ff00; font-family: "Courier New", monospace; border: 2px solid #333;' },
-  { id: 'pre-card', name: '卡片样式', style: 'background: #fff; padding: 20px; border-radius: 12px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;' },
-  { id: 'pre-neon', name: '霓虹效果', style: 'background: #1a1a2e; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 2px solid #00d9ff; box-shadow: 0 0 10px rgba(0,217,255,0.5); color: #e0e0e0;' },
-  { id: 'pre-mac-window', name: 'Mac窗口装饰', style: 'border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.55); margin: 10px 0; padding: 0; position: relative;' },
+  { id: 'pre-leftbar-green', name: '绿色左边框', style: 'background: #f6f8fa; padding: 12px; border-radius: 6px; overflow-x: auto; margin-bottom: 14px; border-left: 3px solid #07c160; font-size: 14px;' },
+  { id: 'pre-simple-gray', name: '简约灰色', style: 'background: #f6f6f6; padding: 16px; border-radius: 4px; overflow-x: auto; margin-bottom: 16px; font-size: 14px;' },
+  { id: 'pre-border', name: '边框样式', style: 'background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #e1e4e8; font-size: 14px;' },
+  { id: 'pre-dark', name: '深色主题', style: 'background: #2d2d2d; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; color: #f8f8f2; font-size: 14px;' },
+  { id: 'pre-mac', name: 'Mac窗口', style: 'background: #1e1e1e; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: #f8f8f2; font-size: 14px;' },
+  { id: 'pre-mac-dark', name: 'Mac深色', style: 'background: #282c34; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); color: #abb2bf; font-size: 14px;' },
+  { id: 'pre-gradient', name: '渐变背景', style: 'background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #667eea30; font-size: 14px;' },
+  { id: 'pre-terminal', name: '终端样式', style: 'background: #0c0c0c; padding: 16px; border-radius: 4px; overflow-x: auto; margin-bottom: 16px; color: #00ff00; font-family: "Courier New", monospace; border: 2px solid #333; font-size: 14px;' },
+  { id: 'pre-card', name: '卡片样式', style: 'background: #fff; padding: 20px; border-radius: 12px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; font-size: 14px;' },
+  { id: 'pre-neon', name: '霓虹效果', style: 'background: #1a1a2e; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 2px solid #00d9ff; box-shadow: 0 0 10px rgba(0,217,255,0.5); color: #e0e0e0; font-size: 14px;' },
+  { id: 'pre-mac-window', name: 'Mac窗口装饰', style: 'border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.55); margin: 10px 0; padding: 0; position: relative; font-size: 14px;' },
 ]
 
 // 引用块样式库
@@ -200,7 +200,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'font-size: 22px; font-weight: 700; margin-top: 20px; margin-bottom: 14px; color: #1a1a1a; line-height: 1.4; border-left: 4px solid #ff8787; padding-left: 12px;',
       h3: 'font-size: 20px; font-weight: 600; margin-top: 20px; margin-bottom: 12px; color: #1a1a1a; line-height: 1.4; padding-left: 20px; position: relative;',
       code: 'background: #fff5f5; padding: 2px 8px; border-radius: 3px; font-family: "Fira Code", Monaco, Menlo, Consolas, monospace; font-size: 14px; color: #e74c3c; border: 1px solid #ffe0e0;',
-      pre: 'background: #fff5f5; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border-left: 3px solid #ff6b6b;',
+      pre: 'background: #fff5f5; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border-left: 3px solid #ff6b6b; font-size: 14px;',
       blockquote: 'border-left: 4px solid #ff6b6b; padding: 12px 16px; color: #666; margin: 16px 0; background: #fff5f5; border-radius: 4px;'
     }
   },
@@ -213,7 +213,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'font-size: 22px; font-weight: 700; margin-top: 20px; margin-bottom: 14px; color: #1a1a1a; line-height: 1.4; border-left: 4px solid #07c160; padding-left: 12px;',
       h3: 'font-size: 20px; font-weight: 600; margin-top: 20px; margin-bottom: 12px; color: #1a1a1a; line-height: 1.4; border-left: 3px solid #3498db; padding-left: 10px;',
       code: 'background: #f0fff4; padding: 2px 8px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 14px; color: #22863a; border: 1px solid #c3f1d4;',
-      pre: 'background: #f6f8fa; padding: 12px; border-radius: 6px; overflow-x: auto; margin-bottom: 14px; border-left: 3px solid #07c160;',
+      pre: 'background: #f6f8fa; padding: 12px; border-radius: 6px; overflow-x: auto; margin-bottom: 14px; border-left: 3px solid #07c160; font-size: 14px;',
       blockquote: 'border-left: 4px solid #07c160; padding: 10px 14px; color: #666; margin: 14px 0; background: #f7f7f7; border-radius: 4px;'
     }
   },
@@ -226,7 +226,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'font-size: 22px; font-weight: 700; margin-top: 20px; margin-bottom: 14px; color: #1a1a1a; line-height: 1.4; border-left: 4px solid #0084ff; padding-left: 12px;',
       h3: 'font-size: 20px; font-weight: 600; margin-top: 20px; margin-bottom: 12px; color: #1a1a1a; line-height: 1.4; border-left: 3px solid #3498db; padding-left: 10px;',
       code: 'background: #e8f4fd; padding: 3px 8px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; color: #0366d6;',
-      pre: 'background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #e1e4e8;',
+      pre: 'background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #e1e4e8; font-size: 14px;',
       blockquote: 'border-left: 4px solid #0084ff; padding: 12px 16px; color: #646464; margin: 16px 0; background: #f9f9f9; font-style: italic;'
     }
   },
@@ -239,7 +239,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'font-size: 22px; font-weight: 700; margin-top: 20px; margin-bottom: 14px; color: #1a1a1a; line-height: 1.4; border-left: 4px solid #9b59b6; padding-left: 12px;',
       h3: 'font-size: 20px; font-weight: 600; margin-top: 20px; margin-bottom: 12px; color: #1a1a1a; line-height: 1.4; border-left: 3px solid #3498db; padding-left: 10px;',
       code: 'background: #f5f0ff; padding: 2px 8px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 14px; color: #6f42c1; border: 1px solid #e0d4ff;',
-      pre: 'background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #667eea30;',
+      pre: 'background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #667eea30; font-size: 14px;',
       blockquote: 'border-left: 4px solid #9b59b6; padding: 12px 16px; color: #555; margin: 16px 0; background: #f8f5ff;'
     }
   },
@@ -252,7 +252,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'font-size: 24px; font-weight: 700; margin-top: 24px; margin-bottom: 16px; color: #1a1a1a; line-height: 1.3; border-bottom: 1px solid #e4e6eb; padding-bottom: 8px;',
       h3: 'font-size: 22px; font-weight: 600; margin-top: 24px; margin-bottom: 16px; color: #24292f; line-height: 1.25;',
       code: 'background: #f6f6f6; padding: 2px 8px; border-radius: 3px; font-family: "SF Mono", Monaco, Menlo, Consolas, monospace; font-size: 14px; color: #0084ff;',
-      pre: 'background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #e1e4e8;',
+      pre: 'background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border: 1px solid #e1e4e8; font-size: 14px;',
       blockquote: 'border-left: 4px solid #d0d7de; padding: 0 16px; color: #57606a; margin: 16px 0;'
     }
   },
@@ -265,7 +265,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'margin: 10px 0 15px 0; padding: 0 0 0 10px; border-left: 5px solid #1e80ff; font-size: 17px; font-weight: bold; color: #222222; line-height: 1.8em; letter-spacing: 0em;',
       h3: 'font-size: 20px; font-weight: 600; margin-top: 20px; margin-bottom: 12px; color: #1a1a1a; line-height: 1.4; border-left: 3px solid #3498db; padding-left: 10px;',
       code: 'background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: Consolas, Monaco, Menlo, monospace; font-size: 14px; color: #d73a49;',
-      pre: 'background: #282c34; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); color: #abb2bf;',
+      pre: 'background: #282c34; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); color: #abb2bf; font-size: 14px;',
       blockquote: 'border-left: 4px solid #1e80ff; padding: 12px 16px; color: #666; margin: 16px 0; background: #f7f7f7; border-radius: 4px;'
     }
   },
@@ -278,7 +278,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'font-size: 22px; font-weight: 700; margin-top: 20px; margin-bottom: 14px; color: #1a1a1a; line-height: 1.4; background: #f8f9fa; padding: 8px 12px; border-radius: 4px;',
       h3: 'font-size: 19px; font-weight: 600; margin-top: 20px; margin-bottom: 12px; color: #2c3e50; line-height: 1.4; background: #ecf0f1; padding: 6px 10px; display: inline-block; border-radius: 3px;',
       code: 'background: #f6f6f6; padding: 2px 8px; border-radius: 3px; font-family: "SF Mono", Monaco, Menlo, Consolas, monospace; font-size: 14px; color: #0084ff;',
-      pre: 'background: #fff; padding: 20px; border-radius: 12px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;',
+      pre: 'background: #fff; padding: 20px; border-radius: 12px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; font-size: 14px;',
       blockquote: 'border-left: 4px solid #34495e; padding: 12px 16px; color: #2c3e50; margin: 16px 0; background: #ecf0f1; font-style: italic;'
     }
   },
@@ -291,7 +291,7 @@ export const presetThemes: PresetTheme[] = [
       h2: 'margin: 10px 0 15px 0; padding: 0 0 0 10px; border-left: 5px solid #f83929; font-size: 17px; font-weight: bold; color: #222222; line-height: 1.8em; letter-spacing: 0em;',
       h3: 'font-size: 20px; font-weight: 600; margin-top: 20px; margin-bottom: 12px; color: #1a1a1a; line-height: 1.4; padding-left: 20px; position: relative;',
       code: 'background: #fff5f5; padding: 2px 8px; border-radius: 3px; font-family: "Fira Code", Monaco, Menlo, Consolas, monospace; font-size: 14px; color: #e74c3c; border: 1px solid #ffe0e0;',
-      pre: 'background: #fff5f5; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border-left: 3px solid #ef7060;',
+      pre: 'background: #fff5f5; padding: 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 16px; border-left: 3px solid #ef7060; font-size: 14px;',
       blockquote: 'border-left: 4px solid #e74c3c; padding: 12px 16px 12px 40px; color: #555; margin: 16px 0; background: #fef5f5; position: relative; font-style: italic;'
     }
   }
