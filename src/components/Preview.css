@@ -1435,3 +1435,29 @@ img[data-clickable-image="true"]:hover {
   padding: 4px 8px;
   text-align: center;
 }
+/* 图片标题样式 */
+.image-with-caption {
+  margin: 14px 0;
+  text-align: center;
+}
+
+.image-caption {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #999;
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.preview-panel.light .image-caption {
+  color: #666;
+}
+
+/* 深色主题下的图片标题 */
+.preview-panel:not(.light) .image-caption {
+  color: #999;
+}
+
+.hljs {
+  background: transparent !important;
+}

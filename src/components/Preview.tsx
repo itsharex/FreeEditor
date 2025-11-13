@@ -476,6 +476,19 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
       }
     })
 
+    // 处理图片，为图片添加标题显示
+    html = html.replace(/<img([^>]*)src="([^"]*)"([^>]*)alt="([^"]*)"([^>]*)>/g, (match, before, src, middle, alt, after) => {
+      // 如果有alt文本，则在图片下方显示标题
+      if (alt && alt.trim()) {
+        return `<figure class="image-with-caption" style="margin: 14px 0; text-align: center;">
+          <img${before}src="${src}"${middle}alt="${alt}"${after}>
+          <figcaption class="image-caption" style="margin-top: 8px; font-size: 14px; color: #999;">${alt}</figcaption>
+        </figure>`
+      }
+      // 没有alt文本，保持原样
+      return match
+    })
+
     setHtmlContent(html)
   }, [content])
 
@@ -581,12 +594,14 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
     const isDark = theme === 'dark'
     const textColor = isDark ? '#d4d4d4' : '#333'
     const sectionBg = isDark ? '#2d2d30' : '#fff'
+    const captionColor = isDark ? '#999' : '#666'
 
     // 调整样式中的颜色
     const adjustStyleForTheme = (style: string): string => {
       if (isDark) {
         return style
           .replace(/color:\s*#333/g, 'color: #d4d4d4')
+          .replace(/color:\s*#666/g, 'color: #999')
           .replace(/color:\s*#1a1a1a/g, 'color: #e0e0e0')
           .replace(/color:\s*#24292f/g, 'color: #d4d4d4')
           .replace(/color:\s*#2e2e2e/g, 'color: #d4d4d4')
@@ -702,6 +717,8 @@ ${html.replace(
       /<strong>/g, `<strong style="${adjustStyleForTheme(defaultStyles.strong)}">`
     ).replace(
       /<em>/g, `<em style="${adjustStyleForTheme(defaultStyles.em)}">`
+    ).replace(
+      /<figcaption class="image-caption"/g, `<figcaption class="image-caption" style="color: ${captionColor}"`
     )}
 </section>`
   }
