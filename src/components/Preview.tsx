@@ -718,7 +718,8 @@ ${html.replace(
     ).replace(
       /<em>/g, `<em style="${adjustStyleForTheme(defaultStyles.em)}">`
     ).replace(
-      /<figcaption class="image-caption"/g, `<figcaption class="image-caption" style="color: ${captionColor}"`
+      /<figcaption class="image-caption" style="[^"]*"/g,
+      `<figcaption class="image-caption" style="margin-top: 8px; font-size: 14px; color: ${captionColor}; text-align: center; line-height: 1.6;"`
     )}
 </section>`
   }
