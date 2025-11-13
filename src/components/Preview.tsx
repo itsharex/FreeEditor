@@ -481,12 +481,12 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
       // 如果有alt文本，则在图片下方显示标题
       if (alt && alt.trim()) {
         return `<figure class="image-with-caption" style="margin: 14px 0; text-align: center;">
-          <img${before}src="${src}"${middle}alt="${alt}"${after}>
+          <img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;">
           <figcaption class="image-caption" style="margin-top: 8px; font-size: 14px; color: #999;">${alt}</figcaption>
         </figure>`
       }
-      // 没有alt文本，保持原样
-      return match
+      // 没有alt文本，保持原样，但仍添加点击功能
+      return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;">`
     })
 
     setHtmlContent(html)

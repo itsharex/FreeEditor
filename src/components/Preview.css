@@ -1441,6 +1441,26 @@ img[data-clickable-image="true"]:hover {
   text-align: center;
 }
 
+.image-with-caption img {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.image-with-caption img:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 深色主题下的图片阴影 */
+.preview-panel:not(.light) .image-with-caption img {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.preview-panel:not(.light) .image-with-caption img:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
 .image-caption {
   margin-top: 8px;
   font-size: 14px;
