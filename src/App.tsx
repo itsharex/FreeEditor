@@ -27,6 +27,7 @@ function App() {
   const foldersRef = useRef<FolderItem[]>(folders)
   const editorRef = useRef<EditorRef>(null)
   const [showOutline, setShowOutline] = useState(false)
+  const [showPreview, setShowPreview] = useState(true)
 
   const [autoSyncConfig] = useLocalStorage<{ enabled: boolean, interval: number }>('autoSyncConfig', {
     enabled: false,
@@ -347,11 +348,14 @@ function App() {
           theme={theme}
           showOutline={showOutline}
           onToggleOutline={() => setShowOutline(!showOutline)}
+          showPreview={showPreview}
+          onTogglePreview={() => setShowPreview(!showPreview)}
         />
         <Preview
           content={currentFile?.content || ''}
           theme={theme}
           onStyleTemplatesChange={setStyleTemplates}
+          showPreview={showPreview}
         />
       </div>
       <Modal

@@ -33,7 +33,8 @@
   flex: 1;
 }
 
-.outline-toggle-btn {
+.outline-toggle-btn,
+.preview-toggle-btn {
   width: 32px;
   height: 32px;
   border: none;
@@ -48,21 +49,25 @@
   flex-shrink: 0;
 }
 
-.editor-panel.light .outline-toggle-btn {
+.editor-panel.light .outline-toggle-btn,
+.editor-panel.light .preview-toggle-btn {
   color: #666;
 }
 
-.outline-toggle-btn:hover {
+.outline-toggle-btn:hover,
+.preview-toggle-btn:hover {
   background: #2a2d2e;
   color: #1890ff;
 }
 
-.editor-panel.light .outline-toggle-btn:hover {
+.editor-panel.light .outline-toggle-btn:hover,
+.editor-panel.light .preview-toggle-btn:hover {
   background: #e0e0e0;
   color: #1890ff;
 }
 
-.outline-toggle-btn svg {
+.outline-toggle-btn svg,
+.preview-toggle-btn svg {
   flex-shrink: 0;
 }
 

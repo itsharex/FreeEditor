@@ -3,6 +3,12 @@
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
+  transition: all 0.3s ease;
+}
+
+/* 隐藏预览区 */
+.preview-panel.preview-hidden {
+  display: none;
 }
 
 /* 明亮模式 */

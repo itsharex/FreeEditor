@@ -27,6 +27,7 @@ interface PreviewProps {
   content: string
   theme: 'dark' | 'light'
   onStyleTemplatesChange?: (templates: StyleTemplate[]) => void
+  showPreview?: boolean
 }
 
 interface CustomStyles {
@@ -74,7 +75,7 @@ const gradientPresets = [
   { id: 8, name: '暖橙红', gradient: 'linear-gradient(135deg, #ff6a00 0%, #ee0979 100%)' },
 ]
 
-export default function Preview({ content, theme = 'dark', onStyleTemplatesChange }: PreviewProps) {
+export default function Preview({ content, theme = 'dark', onStyleTemplatesChange, showPreview = true }: PreviewProps) {
   const [isMobileView, setIsMobileView] = useState(false)
   const [htmlContent, setHtmlContent] = useState('')
   const [showStylePanel, setShowStylePanel] = useState(false)
@@ -1373,7 +1374,7 @@ ${html.replace(
   }
 
   return (
-    <div className={`preview-panel ${theme}`}>
+    <div className={`preview-panel ${theme} ${!showPreview ? 'preview-hidden' : ''}`}>
       <div className="panel-header">
         <h3>预览</h3>
         <div style={{ display: 'flex', gap: '8px' }}>
