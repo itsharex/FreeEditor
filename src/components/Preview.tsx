@@ -59,7 +59,7 @@ const defaultStyles = {
   th: 'border: 1px solid #e0e0e0; padding: 6px 10px; text-align: left; color: #333; background: #f5f5f5; font-weight: 600;',
   td: 'border: 1px solid #e0e0e0; padding: 6px 10px; text-align: left; color: #333;',
   hr: 'border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;',
-  strong: 'font-weight: bold; display: inline; margin: 0; padding: 0;',
+  strong: 'font-weight: bold; display: inline; margin: 0; padding: 0; color: #1890ff;',
   em: 'font-style: italic; display: inline; margin: 0; padding: 0;'
 }
 
