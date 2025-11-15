@@ -55,9 +55,9 @@ const defaultStyles = {
   li: 'margin-bottom: 8px; margin-top: 4px; line-height: 1.8;',
   a: 'color: #576b95; text-decoration: none;',
   img: 'max-width: 100%; height: auto; border-radius: 8px; margin: 14px auto; display: block; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);',
-  table: 'border-collapse: collapse; width: 100%; margin-bottom: 14px; font-size: 14px;',
-  th: 'border: 1px solid #e0e0e0; padding: 6px 10px; text-align: left; color: #333; background: #f5f5f5; font-weight: 600;',
-  td: 'border: 1px solid #e0e0e0; padding: 6px 10px; text-align: left; color: #333;',
+  table: 'border-collapse: separate; border-spacing: 0; width: 100%; margin: 20px 0; font-size: 14px; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(59, 130, 246, 0.05); border: 1px solid #e0f2fe;',
+  th: 'border-bottom: 1px solid #bfdbfe; padding: 10px 14px; text-align: left; color: #475569; background: #f8fafc; font-weight: 600; font-size: 13px;',
+  td: 'border-bottom: 1px solid #f1f5f9; padding: 9px 14px; text-align: left; color: #334155; background: #ffffff;',
   hr: 'border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;',
   strong: 'font-weight: bold; display: inline; margin: 0; padding: 0; color: #1890ff;',
   em: 'font-style: italic; display: inline; margin: 0; padding: 0;'

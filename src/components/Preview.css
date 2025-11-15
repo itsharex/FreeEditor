@@ -1487,3 +1487,127 @@ img[data-clickable-image="true"]:hover {
 .hljs {
   background: transparent !important;
 }
+
+/* Table styles */
+.desktop-preview table,
+.phone-content table,
+.card-preview-card table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+/* Table header */
+.desktop-preview th,
+.phone-content th,
+.card-preview-card th {
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+/* Table row hover effect - 简约淡雅 */
+.desktop-preview tbody tr,
+.phone-content tbody tr,
+.card-preview-card tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.desktop-preview tbody tr:hover,
+.phone-content tbody tr:hover,
+.card-preview-card tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+.desktop-preview tbody tr:hover td,
+.phone-content tbody tr:hover td,
+.card-preview-card tbody tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+/* Striped rows - 极淡的蓝色 */
+.desktop-preview tbody tr:nth-child(even) td,
+.phone-content tbody tr:nth-child(even) td,
+.card-preview-card tbody tr:nth-child(even) td {
+  background-color: #f8fafc !important;
+}
+
+.desktop-preview tbody tr:nth-child(odd) td,
+.phone-content tbody tr:nth-child(odd) td,
+.card-preview-card tbody tr:nth-child(odd) td {
+  background-color: #ffffff !important;
+}
+
+/* Remove border from last row */
+.desktop-preview tbody tr:last-child td,
+.phone-content tbody tr:last-child td,
+.card-preview-card tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* First and last cell border radius */
+.desktop-preview thead tr:first-child th:first-child,
+.phone-content thead tr:first-child th:first-child,
+.card-preview-card thead tr:first-child th:first-child {
+  border-top-left-radius: 6px;
+}
+
+.desktop-preview thead tr:first-child th:last-child,
+.phone-content thead tr:first-child th:last-child,
+.card-preview-card thead tr:first-child th:last-child {
+  border-top-right-radius: 6px;
+}
+
+.desktop-preview tbody tr:last-child td:first-child,
+.phone-content tbody tr:last-child td:first-child,
+.card-preview-card tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 6px;
+}
+
+.desktop-preview tbody tr:last-child td:last-child,
+.phone-content tbody tr:last-child td:last-child,
+.card-preview-card tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 6px;
+}
+
+/* Dark theme table styles - 低调深蓝 */
+.preview-panel:not(.light) .desktop-preview table,
+.preview-panel:not(.light) .phone-content table {
+  border-color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.preview-panel:not(.light) .desktop-preview th,
+.preview-panel:not(.light) .phone-content th {
+  background: #1e293b !important;
+  color: #cbd5e1 !important;
+  border-bottom-color: #334155 !important;
+}
+
+.preview-panel:not(.light) .desktop-preview td,
+.preview-panel:not(.light) .phone-content td {
+  color: #cbd5e1 !important;
+  border-bottom-color: #334155 !important;
+}
+
+.preview-panel:not(.light) .desktop-preview tbody tr:nth-child(even) td,
+.preview-panel:not(.light) .phone-content tbody tr:nth-child(even) td {
+  background-color: #1e293b !important;
+}
+
+.preview-panel:not(.light) .desktop-preview tbody tr:nth-child(odd) td,
+.preview-panel:not(.light) .phone-content tbody tr:nth-child(odd) td {
+  background-color: #0f172a !important;
+}
+
+.preview-panel:not(.light) .desktop-preview tbody tr:hover,
+.preview-panel:not(.light) .phone-content tbody tr:hover {
+  background-color: #1e293b !important;
+}
+
+.preview-panel:not(.light) .desktop-preview tbody tr:hover td,
+.preview-panel:not(.light) .phone-content tbody tr:hover td {
+  background-color: #1e293b !important;
+}
+
+
+
