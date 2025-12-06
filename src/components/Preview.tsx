@@ -480,6 +480,10 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
     // 处理图片，为图片添加标题显示
     // 不做任何包裹，保持最简单的结构以避免微信公众号自动添加空段落
     html = html.replace(/<img([^>]*)src="([^"]*)"([^>]*)alt="([^"]*)"([^>]*)>/g, (match, before, src, middle, alt, after) => {
+      // 如果有alt文本，在图片后添加标题
+      if (alt && alt.trim()) {
+        return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;"><br><span class="image-caption" style="font-size: 14px; color: #999; display: block; text-align: center; margin-top: 8px;">${alt}</span>`
+      }
       return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;">`
     })
 
@@ -644,15 +648,18 @@ ${html.replace(
     ).replace(
       /<p>/g,
       function (match, offset, string) {
-        // 检查这个 p 标签是否只包含图片（用于移除图片段落的上下边距）
+        // 检查这个 p 标签是否只包含图片（用于设置图片段落的样式）
         const afterP = string.substring(offset)
         const closingP = afterP.indexOf('</p>')
         if (closingP !== -1) {
           const pContent = afterP.substring(3, closingP) // 跳过 "<p>"
-          // 如果段落内容只包含 img 标签和可能的空白，则认为是图片段落
+          // 如果段落内容只包含 img 标签和可能的标题，则认为是图片段落
           const trimmedContent = pContent.trim()
-          if (trimmedContent.startsWith('<img') && !trimmedContent.includes('</img>') && trimmedContent.endsWith('>')) {
-            // 这是一个只包含图片的段落，添加适当的上下间距
+          // 检测纯图片或图片+标题的情况
+          if (trimmedContent.startsWith('<img') &&
+              (trimmedContent.match(/<img[^>]*>/g) || []).length === 1 &&
+              !trimmedContent.match(/<img[^>]*>.*?<(?!br|span)/)) {
+            // 这是一个只包含图片（可能带标题）的段落，添加适当的上下间距
             return `<p style="${adjustStyleForTheme(defaultStyles.p).replace(/font-size: \d+px/, `font-size: ${baseFontSize}px`).replace(/margin-bottom: [^;]+;?/, '').replace(/text-align: [^;]+;/, '') + `margin: 10px 0; text-align: center;`}">`
           }
         }
@@ -740,6 +747,9 @@ ${html.replace(
       /<strong>/g, `<strong style="${adjustStyleForTheme(defaultStyles.strong)}">`
     ).replace(
       /<em>/g, `<em style="${adjustStyleForTheme(defaultStyles.em)}">`
+    ).replace(
+      /<span class="image-caption" style="[^"]*"/g,
+      `<span class="image-caption" style="font-size: 14px; color: #999; display: block; text-align: center; margin-top: 8px;"`
     )}
 </section>`
   }
