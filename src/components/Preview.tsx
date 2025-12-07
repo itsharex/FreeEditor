@@ -88,6 +88,7 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
   const [isExporting, setIsExporting] = useState(false)
   const [isCardMode, setIsCardMode] = useState(false)
   const [cardBackground, setCardBackground] = useState('linear-gradient(135deg, #667eea 0%, #764ba2 100%)')
+  const [showImageCaption, setShowImageCaption] = useState(true)
   const previewContentRef = useRef<HTMLDivElement>(null)
   
   // 滚动位置同步 - 基于内容百分比进行实时计算
@@ -480,15 +481,15 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
     // 处理图片，为图片添加标题显示
     // 不做任何包裹，保持最简单的结构以避免微信公众号自动添加空段落
     html = html.replace(/<img([^>]*)src="([^"]*)"([^>]*)alt="([^"]*)"([^>]*)>/g, (match, before, src, middle, alt, after) => {
-      // 如果有alt文本，在图片后添加标题
-      if (alt && alt.trim()) {
+      // 如果有alt文本且开启了图片标题显示，在图片后添加标题
+      if (alt && alt.trim() && showImageCaption) {
         return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;"><span class="image-caption" style="font-size: 14px; color: #999; display: block; text-align: center; margin-top: 8px;">${alt}</span>`
       }
       return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;">`
     })
 
     setHtmlContent(html)
-  }, [content])
+  }, [content, showImageCaption])
 
   // 通知父组件模板变化
   useEffect(() => {
@@ -660,7 +661,7 @@ ${html.replace(
               (trimmedContent.match(/<img[^>]*>/g) || []).length === 1 &&
               !trimmedContent.match(/<img[^>]*>.*?<(?!br|span)/)) {
             // 这是一个只包含图片（可能带标题）的段落，添加适当的上下间距
-            return `<p style="${adjustStyleForTheme(defaultStyles.p).replace(/font-size: \d+px/, `font-size: ${baseFontSize}px`).replace(/margin-bottom: [^;]+;?/, '').replace(/text-align: [^;]+;/, '') + `margin: 0px 0; text-align: center;`}">`
+            return `<p style="${adjustStyleForTheme(defaultStyles.p).replace(/font-size: \d+px/, `font-size: ${baseFontSize}px`).replace(/margin-bottom: [^;]+;?/, '').replace(/text-align: [^;]+;/, '') + `margin: 14px 0; text-align: center;`}">`
           }
         }
         // 普通段落，保持正常样式
@@ -1955,6 +1956,22 @@ ${html.replace(
 
       {/* 状态栏 */}
       <div className="preview-statusbar">
+        <label style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          cursor: 'pointer',
+          fontSize: '13px',
+          userSelect: 'none'
+        }}>
+          <input
+            type="checkbox"
+            checked={showImageCaption}
+            onChange={(e) => setShowImageCaption(e.target.checked)}
+            style={{ cursor: 'pointer' }}
+          />
+          <span>显示图片标题</span>
+        </label>
         {isCardMode && (
           <button
             className="preview-toggle-btn export-image-btn"

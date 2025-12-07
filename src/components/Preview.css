@@ -1320,6 +1320,7 @@ img[data-clickable-image="true"]:hover {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 16px;
   padding: 8px 24px;
   background: #252526;
   border-top: 1px solid #2d2d30;
@@ -1329,10 +1330,18 @@ img[data-clickable-image="true"]:hover {
   flex-shrink: 0;
 }
 
+.preview-statusbar input[type="checkbox"] {
+  accent-color: #858585;
+}
+
 .preview-panel.light .preview-statusbar {
   background: #f5f5f5;
   border-top: 1px solid #e0e0e0;
   color: #666;
+}
+
+.preview-panel.light .preview-statusbar input[type="checkbox"] {
+  accent-color: #666;
 }
 
 .export-image-btn {
