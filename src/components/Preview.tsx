@@ -54,7 +54,7 @@ const defaultStyles = {
   ol: 'margin-bottom: 14px; padding-left: 20px; color: #333; margin-top: 8px; list-style-position: outside;',
   li: 'margin-bottom: 8px; margin-top: 4px; line-height: 1.8;',
   a: 'color: #576b95; text-decoration: none;',
-  img: 'max-width: 100%; height: auto; border-radius: 8px; margin: 0; vertical-align: middle; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);',
+  img: 'max-width: 100%; height: auto; border-radius: 8px; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);',
   table: 'border-collapse: separate; border-spacing: 0; width: 100%; margin: 20px 0; font-size: 14px; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(59, 130, 246, 0.05); border: 1px solid #e0f2fe;',
   th: 'border-bottom: 1px solid #bfdbfe; padding: 10px 14px; text-align: left; color: #475569; background: #f8fafc; font-weight: 600; font-size: 13px;',
   td: 'border-bottom: 1px solid #f1f5f9; padding: 9px 14px; text-align: left; color: #334155; background: #ffffff;',
@@ -482,7 +482,7 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
     html = html.replace(/<img([^>]*)src="([^"]*)"([^>]*)alt="([^"]*)"([^>]*)>/g, (match, before, src, middle, alt, after) => {
       // 如果有alt文本，在图片后添加标题
       if (alt && alt.trim()) {
-        return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;"><br><span class="image-caption" style="font-size: 14px; color: #999; display: block; text-align: center; margin-top: 8px;">${alt}</span>`
+        return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;"><span class="image-caption" style="font-size: 14px; color: #999; display: block; text-align: center; margin-top: 8px;">${alt}</span>`
       }
       return `<img${before}src="${src}"${middle}alt="${alt}"${after} data-clickable-image="true" style="cursor: pointer;">`
     })
@@ -660,7 +660,7 @@ ${html.replace(
               (trimmedContent.match(/<img[^>]*>/g) || []).length === 1 &&
               !trimmedContent.match(/<img[^>]*>.*?<(?!br|span)/)) {
             // 这是一个只包含图片（可能带标题）的段落，添加适当的上下间距
-            return `<p style="${adjustStyleForTheme(defaultStyles.p).replace(/font-size: \d+px/, `font-size: ${baseFontSize}px`).replace(/margin-bottom: [^;]+;?/, '').replace(/text-align: [^;]+;/, '') + `margin: 10px 0; text-align: center;`}">`
+            return `<p style="${adjustStyleForTheme(defaultStyles.p).replace(/font-size: \d+px/, `font-size: ${baseFontSize}px`).replace(/margin-bottom: [^;]+;?/, '').replace(/text-align: [^;]+;/, '') + `margin: 0px 0; text-align: center;`}">`
           }
         }
         // 普通段落，保持正常样式
