@@ -207,16 +207,17 @@
 .xhs-card-footer {
   display: flex;
   justify-content: center;
-  padding-top: 10px;
+  padding-top: 6px;
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .xhs-page-indicator {
-  font-size: 12px;
+  font-size: 11px;
   color: #333;
   background: rgba(255, 255, 255, 0.5);
-  padding: 3px 10px;
-  border-radius: 10px;
+  padding: 2px 8px;
+  border-radius: 8px;
 }
 
 /* 导航区域 */

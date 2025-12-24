@@ -66,30 +66,42 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
     `
     // 添加与卡片内容一致的样式
     tempDiv.querySelectorAll('p').forEach(p => {
-      (p as HTMLElement).style.marginBottom = '8px'
+      const el = p as HTMLElement
+      el.style.marginTop = '0'
+      el.style.marginBottom = '8px'
     })
     tempDiv.querySelectorAll('h1, h2, h3').forEach(h => {
-      (h as HTMLElement).style.marginTop = '12px';
-      (h as HTMLElement).style.marginBottom = '8px'
+      const el = h as HTMLElement
+      el.style.marginTop = '12px'
+      el.style.marginBottom = '8px'
     })
     tempDiv.querySelectorAll('ul, ol').forEach(list => {
-      (list as HTMLElement).style.marginBottom = '8px';
-      (list as HTMLElement).style.paddingLeft = '18px'
+      const el = list as HTMLElement
+      el.style.marginTop = '0'
+      el.style.marginBottom = '8px'
+      el.style.paddingLeft = '18px'
     })
     tempDiv.querySelectorAll('li').forEach(li => {
-      (li as HTMLElement).style.marginBottom = '4px'
+      const el = li as HTMLElement
+      el.style.marginBottom = '4px'
     })
     tempDiv.querySelectorAll('pre').forEach(pre => {
-      (pre as HTMLElement).style.marginBottom = '8px'
+      const el = pre as HTMLElement
+      el.style.marginTop = '0'
+      el.style.marginBottom = '8px'
     })
     tempDiv.querySelectorAll('blockquote').forEach(bq => {
-      (bq as HTMLElement).style.margin = '8px 0'
+      const el = bq as HTMLElement
+      el.style.marginTop = '8px'
+      el.style.marginBottom = '8px'
     })
     tempDiv.querySelectorAll('img').forEach(img => {
-      (img as HTMLElement).style.margin = '6px 0';
-      (img as HTMLElement).style.maxWidth = '100%';
-      (img as HTMLElement).style.height = 'auto';
-      (img as HTMLElement).style.display = 'block'
+      const el = img as HTMLElement
+      el.style.marginTop = '6px'
+      el.style.marginBottom = '6px'
+      el.style.maxWidth = '100%'
+      el.style.height = 'auto'
+      el.style.display = 'block'
     })
 
     document.body.appendChild(tempDiv)
@@ -156,10 +168,10 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
 
     const flatElements = flattenElements()
     const pageContents: string[] = []
-    const maxHeight = CARD_HEIGHT - CARD_PADDING * 2 - 36 // 预留底部页码空间
-    const titleHeight = 50 // 第一页标题空间
+    const maxHeight = CARD_HEIGHT - CARD_PADDING * 2 - 20 // 最小预留空间
+    const titleHeight = 40 // 第一页标题空间
 
-    // 严格按顺序填充
+    // 严格按顺序填充，允许轻微溢出
     let isFirstPage = true
     let currentPageContent = ''
     let currentHeight = 0
@@ -171,14 +183,16 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
 
     for (let i = 0; i < flatElements.length; i++) {
       const item = flatElements[i]
-      let itemHeight = item.height + 2 // 安全边距
+      let itemHeight = item.height
 
       if (item.isListItem && !inList) {
-        itemHeight += 4 // 列表开始额外空间
+        itemHeight += 2 // 列表开始额外空间
       }
 
-      // 检查是否能放下
-      if (currentHeight + itemHeight > availableHeight && currentPageContent !== '') {
+      // 检查是否能放下（允许溢出 10px）
+      const canFit = currentHeight + itemHeight <= availableHeight + 10
+
+      if (!canFit && currentPageContent !== '') {
         // 放不下，先关闭当前列表
         if (inList) {
           currentPageContent += `</${currentListTag}>`
