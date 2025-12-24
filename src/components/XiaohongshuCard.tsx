@@ -48,12 +48,12 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
   }
 
   // 将内容分割成多页
-  const splitContentIntoPages = useCallback(() => {
+  const splitContentIntoPages = useCallback(async () => {
     if (!content || !measureRef.current) return
 
     const html = parseMarkdown(content)
 
-    // 创建临时元素来测量内容
+    // 创建临时元素来测量内容，样式与实际卡片一致
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = html
     tempDiv.style.cssText = `
@@ -61,40 +61,196 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
       visibility: hidden;
       width: ${CARD_WIDTH - CARD_PADDING * 2}px;
       font-size: 14px;
-      line-height: 1.8;
+      line-height: 1.7;
+      color: #1a1a1a;
     `
+    // 添加与卡片内容一致的样式
+    tempDiv.querySelectorAll('p').forEach(p => {
+      (p as HTMLElement).style.marginBottom = '8px'
+    })
+    tempDiv.querySelectorAll('h1, h2, h3').forEach(h => {
+      (h as HTMLElement).style.marginTop = '12px';
+      (h as HTMLElement).style.marginBottom = '8px'
+    })
+    tempDiv.querySelectorAll('ul, ol').forEach(list => {
+      (list as HTMLElement).style.marginBottom = '8px';
+      (list as HTMLElement).style.paddingLeft = '18px'
+    })
+    tempDiv.querySelectorAll('li').forEach(li => {
+      (li as HTMLElement).style.marginBottom = '4px'
+    })
+    tempDiv.querySelectorAll('pre').forEach(pre => {
+      (pre as HTMLElement).style.marginBottom = '8px'
+    })
+    tempDiv.querySelectorAll('blockquote').forEach(bq => {
+      (bq as HTMLElement).style.margin = '8px 0'
+    })
+    tempDiv.querySelectorAll('img').forEach(img => {
+      (img as HTMLElement).style.margin = '6px 0';
+      (img as HTMLElement).style.maxWidth = '100%';
+      (img as HTMLElement).style.height = 'auto';
+      (img as HTMLElement).style.display = 'block'
+    })
+
     document.body.appendChild(tempDiv)
 
-    const allElements = Array.from(tempDiv.children) as HTMLElement[]
-    const pageContents: string[] = []
-    let currentPageContent = ''
-    let currentHeight = 0
-    const maxHeight = CARD_HEIGHT - CARD_PADDING * 2 - 60 // 预留底部页码空间
+    // 等待图片加载完成
+    const images = tempDiv.querySelectorAll('img')
+    await Promise.all(Array.from(images).map(img => {
+      return new Promise<void>(resolve => {
+        if ((img as HTMLImageElement).complete) {
+          resolve()
+        } else {
+          img.onload = () => resolve()
+          img.onerror = () => resolve()
+        }
+      })
+    }))
 
-    // 第一页需要预留标题空间
-    let isFirstPage = true
-    const titleHeight = 80
-
-    for (const element of allElements) {
-      const elementHeight = element.offsetHeight + 16 // 加上 margin
-
-      // 检查是否需要新页
-      const availableHeight = isFirstPage ? maxHeight - titleHeight : maxHeight
-
-      if (currentHeight + elementHeight > availableHeight && currentPageContent) {
-        pageContents.push(currentPageContent)
-        currentPageContent = ''
-        currentHeight = 0
-        isFirstPage = false
-      }
-
-      currentPageContent += element.outerHTML
-      currentHeight += elementHeight
+    // 将元素展开为更细粒度的单元（拆分列表）
+    interface FlatItem {
+      element: HTMLElement
+      html: string
+      height: number
+      isListItem?: boolean
+      listTag?: string
+      used?: boolean
     }
 
-    // 添加最后一页
-    if (currentPageContent) {
-      pageContents.push(currentPageContent)
+    const flattenElements = (): FlatItem[] => {
+      const result: FlatItem[] = []
+      const allElements = Array.from(tempDiv.children) as HTMLElement[]
+
+      for (const element of allElements) {
+        const tagName = element.tagName.toLowerCase()
+        const style = window.getComputedStyle(element)
+        const marginTop = parseFloat(style.marginTop) || 0
+        const marginBottom = parseFloat(style.marginBottom) || 0
+        const height = element.offsetHeight + marginTop + marginBottom
+
+        // 拆分列表为单独的列表项
+        if (tagName === 'ul' || tagName === 'ol') {
+          const listItems = Array.from(element.children) as HTMLElement[]
+          for (const li of listItems) {
+            const liStyle = window.getComputedStyle(li)
+            const liMarginTop = parseFloat(liStyle.marginTop) || 0
+            const liMarginBottom = parseFloat(liStyle.marginBottom) || 0
+            const liHeight = li.offsetHeight + liMarginTop + liMarginBottom
+            result.push({
+              element: li,
+              html: li.outerHTML,
+              height: liHeight,
+              isListItem: true,
+              listTag: tagName
+            })
+          }
+        } else {
+          result.push({
+            element,
+            html: element.outerHTML,
+            height
+          })
+        }
+      }
+      return result
+    }
+
+    const flatElements = flattenElements()
+    const pageContents: string[] = []
+    const maxHeight = CARD_HEIGHT - CARD_PADDING * 2 - 20 // 预留底部页码空间
+    const titleHeight = 44 // 第一页标题空间
+
+    // 贪心填充算法：尽可能填满每一页
+    let isFirstPage = true
+    let safetyCounter = 0
+    const maxIterations = flatElements.length * 2
+
+    while (flatElements.some(item => !item.used) && safetyCounter < maxIterations) {
+      safetyCounter++
+      let currentPageContent = ''
+      let currentHeight = 0
+      const availableHeight = isFirstPage ? maxHeight - titleHeight : maxHeight
+
+      // 追踪当前是否在列表中
+      let inList = false
+      let currentListTag = ''
+
+      // 持续填充直到无法再放入任何元素
+      let changed = true
+      while (changed) {
+        changed = false
+
+        // 遍历所有元素，尝试放入能放下的
+        for (let i = 0; i < flatElements.length; i++) {
+          const item = flatElements[i]
+          if (item.used) continue
+
+          let itemHeight = item.height
+          if (item.isListItem && !inList) {
+            itemHeight += 4
+          }
+
+          const remainingSpace = availableHeight - currentHeight
+
+          // 如果能放下，就放入
+          if (itemHeight <= remainingSpace) {
+            item.used = true
+            changed = true
+
+            if (item.isListItem) {
+              if (!inList) {
+                currentPageContent += `<${item.listTag}>`
+                inList = true
+                currentListTag = item.listTag!
+              } else if (currentListTag !== item.listTag) {
+                currentPageContent += `</${currentListTag}>`
+                currentPageContent += `<${item.listTag}>`
+                currentListTag = item.listTag!
+              }
+              currentPageContent += item.html
+
+              // 检查下一个元素
+              const nextItem = flatElements[i + 1]
+              if (!nextItem || nextItem.used || !nextItem.isListItem || nextItem.listTag !== currentListTag) {
+                currentPageContent += `</${currentListTag}>`
+                inList = false
+              }
+            } else {
+              if (inList) {
+                currentPageContent += `</${currentListTag}>`
+                inList = false
+              }
+              currentPageContent += item.html
+            }
+
+            currentHeight += itemHeight
+          }
+        }
+      }
+
+      // 如果这一页还是空的，强制放入第一个未使用的元素
+      if (currentPageContent === '') {
+        const firstUnused = flatElements.find(item => !item.used)
+        if (firstUnused) {
+          firstUnused.used = true
+          if (firstUnused.isListItem) {
+            currentPageContent = `<${firstUnused.listTag}>${firstUnused.html}</${firstUnused.listTag}>`
+          } else {
+            currentPageContent = firstUnused.html
+          }
+        }
+      }
+
+      // 关闭未关闭的列表
+      if (inList) {
+        currentPageContent += `</${currentListTag}>`
+      }
+
+      if (currentPageContent) {
+        pageContents.push(currentPageContent)
+      }
+
+      isFirstPage = false
     }
 
     // 如果没有内容，至少显示一个空页
