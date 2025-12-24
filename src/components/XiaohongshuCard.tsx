@@ -1,0 +1,399 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { marked } from 'marked'
+import html2canvas from 'html2canvas'
+import './XiaohongshuCard.css'
+
+interface XiaohongshuCardProps {
+  content: string
+  isOpen: boolean
+  onClose: () => void
+  theme: 'dark' | 'light'
+}
+
+// 预设渐变背景
+const gradientPresets = [
+  { id: 1, name: '暖阳橙', gradient: 'linear-gradient(135deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%)' },
+  { id: 2, name: '薄荷绿', gradient: 'linear-gradient(135deg, #96E6A1 0%, #DDD6F3 100%)' },
+  { id: 3, name: '天空蓝', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+  { id: 4, name: '蜜桃粉', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
+  { id: 5, name: '清新紫', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+  { id: 6, name: '柠檬黄', gradient: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' },
+  { id: 7, name: '樱花粉', gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)' },
+  { id: 8, name: '森林绿', gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
+  { id: 9, name: '珊瑚红', gradient: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)' },
+  { id: 10, name: '星空紫', gradient: 'linear-gradient(135deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)' },
+  { id: 11, name: '纯白', gradient: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)' },
+  { id: 12, name: '奶茶色', gradient: 'linear-gradient(135deg, #f6e3ce 0%, #d9c5a0 100%)' },
+]
+
+// 小红书卡片尺寸预设（3:4比例）
+const CARD_WIDTH = 360
+const CARD_HEIGHT = 480
+const CARD_PADDING = 32
+
+export default function XiaohongshuCard({ content, isOpen, onClose, theme }: XiaohongshuCardProps) {
+  const [pages, setPages] = useState<string[]>([])
+  const [currentPage, setCurrentPage] = useState(0)
+  const [cardBackground, setCardBackground] = useState(gradientPresets[0].gradient)
+  const [isExporting, setIsExporting] = useState(false)
+  const [showStylePanel, setShowStylePanel] = useState(false)
+  const [titleStyle, setTitleStyle] = useState<'modern' | 'classic' | 'minimal'>('modern')
+  const cardContentRef = useRef<HTMLDivElement>(null)
+  const measureRef = useRef<HTMLDivElement>(null)
+
+  // 解析 Markdown 为 HTML
+  const parseMarkdown = (md: string): string => {
+    return marked.parse(md) as string
+  }
+
+  // 将内容分割成多页
+  const splitContentIntoPages = useCallback(() => {
+    if (!content || !measureRef.current) return
+
+    const html = parseMarkdown(content)
+
+    // 创建临时元素来测量内容
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = html
+    tempDiv.style.cssText = `
+      position: absolute;
+      visibility: hidden;
+      width: ${CARD_WIDTH - CARD_PADDING * 2}px;
+      font-size: 14px;
+      line-height: 1.8;
+    `
+    document.body.appendChild(tempDiv)
+
+    const allElements = Array.from(tempDiv.children) as HTMLElement[]
+    const pageContents: string[] = []
+    let currentPageContent = ''
+    let currentHeight = 0
+    const maxHeight = CARD_HEIGHT - CARD_PADDING * 2 - 60 // 预留底部页码空间
+
+    // 第一页需要预留标题空间
+    let isFirstPage = true
+    const titleHeight = 80
+
+    for (const element of allElements) {
+      const elementHeight = element.offsetHeight + 16 // 加上 margin
+
+      // 检查是否需要新页
+      const availableHeight = isFirstPage ? maxHeight - titleHeight : maxHeight
+
+      if (currentHeight + elementHeight > availableHeight && currentPageContent) {
+        pageContents.push(currentPageContent)
+        currentPageContent = ''
+        currentHeight = 0
+        isFirstPage = false
+      }
+
+      currentPageContent += element.outerHTML
+      currentHeight += elementHeight
+    }
+
+    // 添加最后一页
+    if (currentPageContent) {
+      pageContents.push(currentPageContent)
+    }
+
+    // 如果没有内容，至少显示一个空页
+    if (pageContents.length === 0) {
+      pageContents.push('<p>暂无内容</p>')
+    }
+
+    document.body.removeChild(tempDiv)
+    setPages(pageContents)
+    setCurrentPage(0)
+  }, [content])
+
+  useEffect(() => {
+    if (isOpen && content) {
+      // 延迟执行以确保 DOM 已渲染
+      setTimeout(splitContentIntoPages, 100)
+    }
+  }, [isOpen, content, splitContentIntoPages])
+
+  // 获取文章标题（第一个 h1 或第一行）
+  const getTitle = (): string => {
+    const h1Match = content.match(/^#\s+(.+)$/m)
+    if (h1Match) return h1Match[1]
+
+    const firstLine = content.split('\n')[0]
+    return firstLine.replace(/^#+\s*/, '').slice(0, 20) || '小红书卡片'
+  }
+
+  // 导出当前页为图片
+  const exportCurrentPage = async () => {
+    const cardElement = document.querySelector('.xhs-card-preview') as HTMLElement
+    if (!cardElement) return
+
+    setIsExporting(true)
+
+    try {
+      const canvas = await html2canvas(cardElement, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+      })
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.download = `xiaohongshu-card-${currentPage + 1}.png`
+          link.href = url
+          link.click()
+          URL.revokeObjectURL(url)
+        }
+      }, 'image/png')
+    } catch (error) {
+      console.error('导出图片失败:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  // 导出所有页为图片
+  const exportAllPages = async () => {
+    setIsExporting(true)
+
+    try {
+      for (let i = 0; i < pages.length; i++) {
+        setCurrentPage(i)
+        await new Promise(resolve => setTimeout(resolve, 300)) // 等待渲染
+
+        const cardElement = document.querySelector('.xhs-card-preview') as HTMLElement
+        if (!cardElement) continue
+
+        const canvas = await html2canvas(cardElement, {
+          backgroundColor: null,
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+        })
+
+        await new Promise<void>((resolve) => {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob)
+              const link = document.createElement('a')
+              link.download = `xiaohongshu-card-${i + 1}.png`
+              link.href = url
+              link.click()
+              URL.revokeObjectURL(url)
+            }
+            resolve()
+          }, 'image/png')
+        })
+
+        await new Promise(resolve => setTimeout(resolve, 500)) // 下载间隔
+      }
+    } catch (error) {
+      console.error('导出图片失败:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  // 键盘导航
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return
+
+      if (e.key === 'Escape') {
+        onClose()
+      } else if (e.key === 'ArrowLeft' && currentPage > 0) {
+        setCurrentPage(currentPage - 1)
+      } else if (e.key === 'ArrowRight' && currentPage < pages.length - 1) {
+        setCurrentPage(currentPage + 1)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, currentPage, pages.length, onClose])
+
+  if (!isOpen) return null
+
+  const title = getTitle()
+
+  return (
+    <div className="xhs-overlay" onClick={onClose}>
+      <div className="xhs-container" onClick={(e) => e.stopPropagation()}>
+        {/* 左侧：卡片预览 */}
+        <div className="xhs-preview-section">
+          <div
+            className="xhs-card-preview"
+            style={{ background: cardBackground }}
+            ref={cardContentRef}
+          >
+            <div className={`xhs-card-content title-style-${titleStyle}`}>
+              {/* 标题（仅第一页显示） */}
+              {currentPage === 0 && (
+                <div className="xhs-card-title">
+                  <h1>{title}</h1>
+                </div>
+              )}
+
+              {/* 内容区域 */}
+              <div
+                className="xhs-card-body"
+                dangerouslySetInnerHTML={{ __html: pages[currentPage] || '' }}
+              />
+
+              {/* 页码 */}
+              <div className="xhs-card-footer">
+                <span className="xhs-page-indicator">
+                  {currentPage + 1} / {pages.length}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 页面导航 */}
+          <div className="xhs-navigation">
+            <button
+              className="xhs-nav-btn"
+              onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+              disabled={currentPage === 0}
+            >
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+              </svg>
+            </button>
+            <div className="xhs-page-dots">
+              {pages.map((_, index) => (
+                <button
+                  key={index}
+                  className={`xhs-page-dot ${index === currentPage ? 'active' : ''}`}
+                  onClick={() => setCurrentPage(index)}
+                />
+              ))}
+            </div>
+            <button
+              className="xhs-nav-btn"
+              onClick={() => setCurrentPage(Math.min(pages.length - 1, currentPage + 1))}
+              disabled={currentPage === pages.length - 1}
+            >
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* 右侧：样式控制面板 */}
+        <div className={`xhs-style-panel ${showStylePanel ? 'visible' : ''}`}>
+          <div className="xhs-panel-header">
+            <h3>卡片样式</h3>
+            <button className="xhs-close-btn" onClick={onClose}>
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div className="xhs-panel-content">
+            {/* 背景选择 */}
+            <div className="xhs-panel-section">
+              <label>背景颜色</label>
+              <div className="xhs-gradient-grid">
+                {gradientPresets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    className={`xhs-gradient-btn ${cardBackground === preset.gradient ? 'active' : ''}`}
+                    style={{ background: preset.gradient }}
+                    onClick={() => setCardBackground(preset.gradient)}
+                    title={preset.name}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* 标题样式 */}
+            <div className="xhs-panel-section">
+              <label>标题样式</label>
+              <div className="xhs-title-style-options">
+                <button
+                  className={`xhs-style-option ${titleStyle === 'modern' ? 'active' : ''}`}
+                  onClick={() => setTitleStyle('modern')}
+                >
+                  现代风
+                </button>
+                <button
+                  className={`xhs-style-option ${titleStyle === 'classic' ? 'active' : ''}`}
+                  onClick={() => setTitleStyle('classic')}
+                >
+                  经典风
+                </button>
+                <button
+                  className={`xhs-style-option ${titleStyle === 'minimal' ? 'active' : ''}`}
+                  onClick={() => setTitleStyle('minimal')}
+                >
+                  极简风
+                </button>
+              </div>
+            </div>
+
+            {/* 页面信息 */}
+            <div className="xhs-panel-section">
+              <label>页面信息</label>
+              <div className="xhs-page-info">
+                <span>共 {pages.length} 页</span>
+                <span>当前第 {currentPage + 1} 页</span>
+              </div>
+            </div>
+
+            {/* 导出按钮 */}
+            <div className="xhs-panel-section xhs-export-section">
+              <button
+                className="xhs-export-btn"
+                onClick={exportCurrentPage}
+                disabled={isExporting}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8.5 1a.5.5 0 0 0-1 0v8.793L4.354 6.646a.5.5 0 1 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0-.708-.708L8.5 9.793V1z"/>
+                  <path d="M3 13h10a1 1 0 0 0 1-1V9.5a.5.5 0 0 0-1 0V12H3V9.5a.5.5 0 0 0-1 0V12a1 1 0 0 0 1 1z"/>
+                </svg>
+                导出当前页
+              </button>
+              <button
+                className="xhs-export-btn xhs-export-all"
+                onClick={exportAllPages}
+                disabled={isExporting}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm0-1h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z"/>
+                  <path d="M4.5 11.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                  <path d="M8 4a.5.5 0 0 1 .5.5v5.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+                </svg>
+                {isExporting ? '导出中...' : `导出全部 (${pages.length}页)`}
+              </button>
+            </div>
+
+            {/* 提示信息 */}
+            <div className="xhs-tips">
+              <p>提示：使用左右箭头键切换页面，ESC 键关闭</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 移动端样式面板切换按钮 */}
+        <button
+          className="xhs-toggle-panel-btn"
+          onClick={() => setShowStylePanel(!showStylePanel)}
+        >
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* 用于测量内容高度的隐藏元素 */}
+      <div ref={measureRef} style={{ position: 'absolute', visibility: 'hidden', width: CARD_WIDTH - CARD_PADDING * 2 }} />
+    </div>
+  )
+}

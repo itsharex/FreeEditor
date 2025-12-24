@@ -108,6 +108,11 @@
   color: #1890ff;
 }
 
+/* 小红书按钮样式 */
+.xiaohongshu-btn:hover {
+  color: #ff2442 !important;
+}
+
 /* Style Panel */
 .preview-content {
   flex: 1;

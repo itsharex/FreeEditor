@@ -5,6 +5,7 @@ import Preview from './components/Preview'
 import Outline from './components/Outline'
 import Modal from './components/Modal'
 import Settings from './components/Settings'
+import XiaohongshuCard from './components/XiaohongshuCard'
 import useLocalStorage from './hooks/useLocalStorage'
 import { FileItem, FolderItem, ModalState, StyleTemplate } from './types'
 import { syncWithOSS } from './utils/ossBackup'
@@ -28,6 +29,7 @@ function App() {
   const editorRef = useRef<EditorRef>(null)
   const [showOutline, setShowOutline] = useState(false)
   const [showPreview, setShowPreview] = useState(true)
+  const [showXiaohongshuCard, setShowXiaohongshuCard] = useState(false)
 
   const [autoSyncConfig] = useLocalStorage<{ enabled: boolean, interval: number }>('autoSyncConfig', {
     enabled: false,
@@ -356,6 +358,7 @@ function App() {
           theme={theme}
           onStyleTemplatesChange={setStyleTemplates}
           showPreview={showPreview}
+          onXiaohongshuCard={() => setShowXiaohongshuCard(true)}
         />
       </div>
       <Modal
@@ -372,6 +375,12 @@ function App() {
         files={files}
         folders={folders}
         onSyncComplete={handleSyncComplete}
+      />
+      <XiaohongshuCard
+        content={currentFile?.content || ''}
+        isOpen={showXiaohongshuCard}
+        onClose={() => setShowXiaohongshuCard(false)}
+        theme={theme}
       />
     </div>
   )
