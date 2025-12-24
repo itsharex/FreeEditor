@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { marked } from 'marked'
 import html2canvas from 'html2canvas'
+import JSZip from 'jszip'
 import './XiaohongshuCard.css'
 
 interface XiaohongshuCardProps {
@@ -155,9 +156,11 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
     }
   }
 
-  // 导出所有页为图片
+  // 导出所有页为图片（打包成zip）
   const exportAllPages = async () => {
     setIsExporting(true)
+    const zip = new JSZip()
+    const originalPage = currentPage
 
     try {
       for (let i = 0; i < pages.length; i++) {
@@ -175,22 +178,28 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
           logging: false,
         })
 
+        // 将 canvas 转换为 blob 并添加到 zip
         await new Promise<void>((resolve) => {
           canvas.toBlob((blob) => {
             if (blob) {
-              const url = URL.createObjectURL(blob)
-              const link = document.createElement('a')
-              link.download = `xiaohongshu-card-${i + 1}.png`
-              link.href = url
-              link.click()
-              URL.revokeObjectURL(url)
+              zip.file(`xiaohongshu-card-${i + 1}.png`, blob)
             }
             resolve()
           }, 'image/png')
         })
-
-        await new Promise(resolve => setTimeout(resolve, 500)) // 下载间隔
       }
+
+      // 生成并下载 zip 文件
+      const zipBlob = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(zipBlob)
+      const link = document.createElement('a')
+      link.download = `xiaohongshu-cards-${Date.now()}.zip`
+      link.href = url
+      link.click()
+      URL.revokeObjectURL(url)
+
+      // 恢复到原来的页面
+      setCurrentPage(originalPage)
     } catch (error) {
       console.error('导出图片失败:', error)
     } finally {
@@ -374,10 +383,6 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
               </button>
             </div>
 
-            {/* 提示信息 */}
-            <div className="xhs-tips">
-              <p>提示：使用左右箭头键切换页面，ESC 键关闭</p>
-            </div>
           </div>
         </div>
 
