@@ -30,7 +30,7 @@ const gradientPresets = [
 // 小红书卡片尺寸预设（3:4比例）
 const CARD_WIDTH = 360
 const CARD_HEIGHT = 480
-const CARD_PADDING = 32
+const CARD_PADDING = 28
 
 export default function XiaohongshuCard({ content, isOpen, onClose, theme }: XiaohongshuCardProps) {
   const [pages, setPages] = useState<string[]>([])
@@ -114,7 +114,6 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
       height: number
       isListItem?: boolean
       listTag?: string
-      used?: boolean
     }
 
     const flattenElements = (): FlatItem[] => {
@@ -157,100 +156,80 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
 
     const flatElements = flattenElements()
     const pageContents: string[] = []
-    const maxHeight = CARD_HEIGHT - CARD_PADDING * 2 - 20 // 预留底部页码空间
-    const titleHeight = 44 // 第一页标题空间
+    const maxHeight = CARD_HEIGHT - CARD_PADDING * 2 - 36 // 预留底部页码空间
+    const titleHeight = 50 // 第一页标题空间
 
-    // 贪心填充算法：尽可能填满每一页
+    // 严格按顺序填充
     let isFirstPage = true
-    let safetyCounter = 0
-    const maxIterations = flatElements.length * 2
+    let currentPageContent = ''
+    let currentHeight = 0
+    let availableHeight = maxHeight - titleHeight
 
-    while (flatElements.some(item => !item.used) && safetyCounter < maxIterations) {
-      safetyCounter++
-      let currentPageContent = ''
-      let currentHeight = 0
-      const availableHeight = isFirstPage ? maxHeight - titleHeight : maxHeight
+    // 追踪当前是否在列表中
+    let inList = false
+    let currentListTag = ''
 
-      // 追踪当前是否在列表中
-      let inList = false
-      let currentListTag = ''
+    for (let i = 0; i < flatElements.length; i++) {
+      const item = flatElements[i]
+      let itemHeight = item.height + 2 // 安全边距
 
-      // 持续填充直到无法再放入任何元素
-      let changed = true
-      while (changed) {
-        changed = false
+      if (item.isListItem && !inList) {
+        itemHeight += 4 // 列表开始额外空间
+      }
 
-        // 遍历所有元素，尝试放入能放下的
-        for (let i = 0; i < flatElements.length; i++) {
-          const item = flatElements[i]
-          if (item.used) continue
-
-          let itemHeight = item.height
-          if (item.isListItem && !inList) {
-            itemHeight += 4
-          }
-
-          const remainingSpace = availableHeight - currentHeight
-
-          // 如果能放下，就放入
-          if (itemHeight <= remainingSpace) {
-            item.used = true
-            changed = true
-
-            if (item.isListItem) {
-              if (!inList) {
-                currentPageContent += `<${item.listTag}>`
-                inList = true
-                currentListTag = item.listTag!
-              } else if (currentListTag !== item.listTag) {
-                currentPageContent += `</${currentListTag}>`
-                currentPageContent += `<${item.listTag}>`
-                currentListTag = item.listTag!
-              }
-              currentPageContent += item.html
-
-              // 检查下一个元素
-              const nextItem = flatElements[i + 1]
-              if (!nextItem || nextItem.used || !nextItem.isListItem || nextItem.listTag !== currentListTag) {
-                currentPageContent += `</${currentListTag}>`
-                inList = false
-              }
-            } else {
-              if (inList) {
-                currentPageContent += `</${currentListTag}>`
-                inList = false
-              }
-              currentPageContent += item.html
-            }
-
-            currentHeight += itemHeight
-          }
+      // 检查是否能放下
+      if (currentHeight + itemHeight > availableHeight && currentPageContent !== '') {
+        // 放不下，先关闭当前列表
+        if (inList) {
+          currentPageContent += `</${currentListTag}>`
+          inList = false
         }
-      }
-
-      // 如果这一页还是空的，强制放入第一个未使用的元素
-      if (currentPageContent === '') {
-        const firstUnused = flatElements.find(item => !item.used)
-        if (firstUnused) {
-          firstUnused.used = true
-          if (firstUnused.isListItem) {
-            currentPageContent = `<${firstUnused.listTag}>${firstUnused.html}</${firstUnused.listTag}>`
-          } else {
-            currentPageContent = firstUnused.html
-          }
-        }
-      }
-
-      // 关闭未关闭的列表
-      if (inList) {
-        currentPageContent += `</${currentListTag}>`
-      }
-
-      if (currentPageContent) {
+        // 保存当前页
         pageContents.push(currentPageContent)
+        currentPageContent = ''
+        currentHeight = 0
+        isFirstPage = false
+        availableHeight = maxHeight
       }
 
-      isFirstPage = false
+      // 处理列表项
+      if (item.isListItem) {
+        if (!inList) {
+          currentPageContent += `<${item.listTag}>`
+          inList = true
+          currentListTag = item.listTag!
+        } else if (currentListTag !== item.listTag) {
+          currentPageContent += `</${currentListTag}>`
+          currentPageContent += `<${item.listTag}>`
+          currentListTag = item.listTag!
+        }
+        currentPageContent += item.html
+
+        // 检查下一个元素是否是同类型列表项
+        const nextItem = flatElements[i + 1]
+        if (!nextItem || !nextItem.isListItem || nextItem.listTag !== currentListTag) {
+          currentPageContent += `</${currentListTag}>`
+          inList = false
+        }
+      } else {
+        if (inList) {
+          currentPageContent += `</${currentListTag}>`
+          inList = false
+        }
+        currentPageContent += item.html
+      }
+
+      currentHeight += itemHeight
+    }
+
+    // 关闭未关闭的列表
+    if (inList) {
+      currentPageContent += `</${currentListTag}>`
+    }
+
+    // 添加最后一页
+    if (currentPageContent) {
+      pageContents.push(currentPageContent)
     }
 
     // 如果没有内容，至少显示一个空页
