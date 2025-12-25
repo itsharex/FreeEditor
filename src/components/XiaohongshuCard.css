@@ -285,6 +285,11 @@
   overflow: hidden;
 }
 
+.xhs-container.light .xhs-style-panel {
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
 .xhs-panel-header {
   display: flex;
   justify-content: space-between;
@@ -293,11 +298,19 @@
   border-bottom: 1px solid #333;
 }
 
+.xhs-container.light .xhs-panel-header {
+  border-bottom: 1px solid #e0e0e0;
+}
+
 .xhs-panel-header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
   color: #fff;
+}
+
+.xhs-container.light .xhs-panel-header h3 {
+  color: #333;
 }
 
 .xhs-close-btn {
@@ -319,6 +332,11 @@
   color: #fff;
 }
 
+.xhs-container.light .xhs-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
 .xhs-panel-content {
   flex: 1;
   padding: 20px;
@@ -335,6 +353,10 @@
   color: #999;
   margin-bottom: 12px;
   font-weight: 500;
+}
+
+.xhs-container.light .xhs-panel-section label {
+  color: #666;
 }
 
 /* 渐变选择器 */
@@ -380,9 +402,19 @@
   transition: all 0.2s;
 }
 
+.xhs-container.light .xhs-style-option {
+  border: 1px solid #ddd;
+  color: #666;
+}
+
 .xhs-style-option:hover {
   border-color: #555;
   color: #fff;
+}
+
+.xhs-container.light .xhs-style-option:hover {
+  border-color: #999;
+  color: #333;
 }
 
 .xhs-style-option.active {
@@ -400,6 +432,11 @@
   border-radius: 8px;
   font-size: 13px;
   color: #999;
+}
+
+.xhs-container.light .xhs-page-info {
+  background: #f5f5f5;
+  color: #666;
 }
 
 /* 导出按钮 */
@@ -425,6 +462,15 @@
 .xhs-export-btn:first-of-type {
   background: #333;
   color: #fff;
+}
+
+.xhs-container.light .xhs-export-btn:first-of-type {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.xhs-container.light .xhs-export-btn:first-of-type:hover {
+  background: #d0d0d0;
 }
 
 .xhs-export-btn:first-of-type:hover {

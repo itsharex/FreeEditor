@@ -380,7 +380,7 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
 
   return (
     <div className="xhs-overlay" onClick={onClose}>
-      <div className="xhs-container" onClick={(e) => e.stopPropagation()}>
+      <div className={`xhs-container ${theme}`} onClick={(e) => e.stopPropagation()}>
         {/* 左侧：卡片预览 */}
         <div className="xhs-preview-section">
           <div
