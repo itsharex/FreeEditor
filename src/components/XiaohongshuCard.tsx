@@ -272,6 +272,84 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
     return firstLine.replace(/^#+\s*/, '').slice(0, 20) || '小红书卡片'
   }
 
+  // 将图片转换为 base64
+  const convertImageToBase64 = async (img: HTMLImageElement): Promise<string> => {
+    if (img.src.startsWith('data:')) {
+      return img.src
+    }
+
+    // 如果图片已经加载完成，直接用 canvas 转换
+    if (img.complete && img.naturalWidth > 0) {
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.naturalWidth
+        canvas.height = img.naturalHeight
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(img, 0, 0)
+          return canvas.toDataURL('image/png')
+        }
+      } catch (e) {
+        // 跨域错误，尝试其他方法
+      }
+    }
+
+    // 尝试重新加载图片
+    return new Promise((resolve) => {
+      const tempImg = new Image()
+
+      // 先尝试不带 crossOrigin
+      const tryWithoutCORS = () => {
+        const img2 = new Image()
+        img2.onload = () => {
+          try {
+            const canvas = document.createElement('canvas')
+            canvas.width = img2.naturalWidth
+            canvas.height = img2.naturalHeight
+            const ctx = canvas.getContext('2d')
+            if (ctx) {
+              ctx.drawImage(img2, 0, 0)
+              resolve(canvas.toDataURL('image/png'))
+            } else {
+              resolve(img.src)
+            }
+          } catch (e) {
+            resolve(img.src)
+          }
+        }
+        img2.onerror = () => resolve(img.src)
+        img2.src = img.src
+      }
+
+      tempImg.crossOrigin = 'anonymous'
+      tempImg.onload = () => {
+        try {
+          const canvas = document.createElement('canvas')
+          canvas.width = tempImg.naturalWidth
+          canvas.height = tempImg.naturalHeight
+          const ctx = canvas.getContext('2d')
+          if (ctx) {
+            ctx.drawImage(tempImg, 0, 0)
+            resolve(canvas.toDataURL('image/png'))
+          } else {
+            resolve(img.src)
+          }
+        } catch (e) {
+          // crossOrigin 方式失败，尝试不带 crossOrigin
+          tryWithoutCORS()
+        }
+      }
+      tempImg.onerror = () => tryWithoutCORS()
+
+      // 添加时间戳避免缓存
+      const separator = img.src.includes('?') ? '&' : '?'
+      tempImg.src = img.src + separator + '_t=' + Date.now()
+
+      // 超时处理
+      setTimeout(() => resolve(img.src), 5000)
+    })
+  }
+
   // 导出当前页为图片
   const exportCurrentPage = async () => {
     const cardElement = document.querySelector('.xhs-card-preview') as HTMLElement
@@ -280,12 +358,26 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
     setIsExporting(true)
 
     try {
+      // 等待图片加载并转换为 base64
+      const images = cardElement.querySelectorAll('img')
+      for (const img of Array.from(images)) {
+        const imgEl = img as HTMLImageElement
+        if (!imgEl.src.startsWith('data:')) {
+          const base64 = await convertImageToBase64(imgEl)
+          imgEl.src = base64
+        }
+      }
+
+      // 等待一下确保图片已更新
+      await new Promise(resolve => setTimeout(resolve, 100))
+
       const canvas = await html2canvas(cardElement, {
         backgroundColor: null,
         scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
+        imageTimeout: 0,
       })
 
       canvas.toBlob((blob) => {
@@ -305,26 +397,161 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
     }
   }
 
+  // 收集并转换所有图片为 base64
+  const collectImageBase64Map = async (): Promise<Map<string, string>> => {
+    const imageMap = new Map<string, string>()
+    const processedUrls = new Set<string>()
+
+    // 从所有 pages HTML 中提取图片 URL
+    for (const pageHtml of pages) {
+      // 使用 DOM 解析来提取图片
+      const tempDiv = document.createElement('div')
+      tempDiv.innerHTML = pageHtml
+      const images = tempDiv.querySelectorAll('img')
+
+      for (const img of Array.from(images)) {
+        const imgEl = img as HTMLImageElement
+        const src = imgEl.getAttribute('src') || ''
+
+        if (src && !src.startsWith('data:') && !processedUrls.has(src)) {
+          processedUrls.add(src)
+
+          // 创建可见的临时图片来加载
+          const loadImg = document.createElement('img')
+          loadImg.style.cssText = 'position: fixed; left: -9999px; top: 0; opacity: 0;'
+          loadImg.src = src
+          document.body.appendChild(loadImg)
+
+          // 等待图片加载
+          await new Promise<void>(resolve => {
+            if (loadImg.complete && loadImg.naturalWidth > 0) {
+              resolve()
+            } else {
+              loadImg.onload = () => resolve()
+              loadImg.onerror = () => resolve()
+              setTimeout(resolve, 3000)
+            }
+          })
+
+          // 转换为 base64
+          if (loadImg.complete && loadImg.naturalWidth > 0) {
+            const base64 = await convertImageToBase64(loadImg)
+            if (base64.startsWith('data:')) {
+              imageMap.set(src, base64)
+            }
+          }
+
+          // 清理临时图片
+          document.body.removeChild(loadImg)
+        }
+      }
+    }
+
+    return imageMap
+  }
+
+  // 替换 HTML 中的图片 src 为 base64
+  const replaceImagesWithBase64 = (html: string, imageMap: Map<string, string>): string => {
+    let result = html
+    imageMap.forEach((base64, originalSrc) => {
+      // 转义特殊字符用于正则
+      const escapedSrc = originalSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      result = result.replace(new RegExp(`src="${escapedSrc}"`, 'g'), `src="${base64}"`)
+    })
+    return result
+  }
+
   // 导出所有页为图片（打包成zip）
   const exportAllPages = async () => {
     setIsExporting(true)
     const zip = new JSZip()
-    const originalPage = currentPage
 
     try {
+      // 先收集所有图片并转换为 base64
+      const imageMap = await collectImageBase64Map()
+
+      // 创建隐藏的渲染容器
+      const hiddenContainer = document.createElement('div')
+      hiddenContainer.style.cssText = `
+        position: fixed;
+        left: -9999px;
+        top: 0;
+        width: ${CARD_WIDTH}px;
+        height: ${CARD_HEIGHT}px;
+      `
+      document.body.appendChild(hiddenContainer)
+
       for (let i = 0; i < pages.length; i++) {
-        setCurrentPage(i)
-        await new Promise(resolve => setTimeout(resolve, 300)) // 等待渲染
+        // 创建卡片元素
+        const cardDiv = document.createElement('div')
+        cardDiv.className = 'xhs-card-preview'
+        cardDiv.style.cssText = `
+          width: ${CARD_WIDTH}px;
+          height: ${CARD_HEIGHT}px;
+          border-radius: 16px;
+          overflow: hidden;
+          background: ${cardBackground};
+        `
 
-        const cardElement = document.querySelector('.xhs-card-preview') as HTMLElement
-        if (!cardElement) continue
+        const contentDiv = document.createElement('div')
+        contentDiv.className = `xhs-card-content title-style-${titleStyle}`
+        contentDiv.style.cssText = `
+          width: 100%;
+          height: 100%;
+          padding: ${CARD_PADDING}px;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+        `
 
-        const canvas = await html2canvas(cardElement, {
+        // 添加标题（仅第一页）
+        if (i === 0) {
+          const titleDiv = document.createElement('div')
+          titleDiv.className = 'xhs-card-title'
+          titleDiv.innerHTML = `<h1>${getTitle()}</h1>`
+          contentDiv.appendChild(titleDiv)
+        }
+
+        // 添加内容 - 使用替换后的 HTML
+        const bodyDiv = document.createElement('div')
+        bodyDiv.className = 'xhs-card-body'
+        bodyDiv.innerHTML = replaceImagesWithBase64(pages[i], imageMap)
+        contentDiv.appendChild(bodyDiv)
+
+        // 添加页码
+        const footerDiv = document.createElement('div')
+        footerDiv.className = 'xhs-card-footer'
+        footerDiv.innerHTML = `<span class="xhs-page-indicator">${i + 1} / ${pages.length}</span>`
+        contentDiv.appendChild(footerDiv)
+
+        cardDiv.appendChild(contentDiv)
+        hiddenContainer.innerHTML = ''
+        hiddenContainer.appendChild(cardDiv)
+
+        // 等待图片加载完成
+        const images = cardDiv.querySelectorAll('img')
+        await Promise.all(Array.from(images).map(img => {
+          return new Promise<void>(resolve => {
+            if ((img as HTMLImageElement).complete) {
+              resolve()
+            } else {
+              img.onload = () => resolve()
+              img.onerror = () => resolve()
+              setTimeout(resolve, 1000)
+            }
+          })
+        }))
+
+        // 等待一小段时间确保渲染完成
+        await new Promise(resolve => setTimeout(resolve, 50))
+
+        const canvas = await html2canvas(cardDiv, {
           backgroundColor: null,
           scale: 2,
           useCORS: true,
           allowTaint: true,
           logging: false,
+          imageTimeout: 0,
         })
 
         // 将 canvas 转换为 blob 并添加到 zip
@@ -338,6 +565,9 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
         })
       }
 
+      // 清理隐藏容器
+      document.body.removeChild(hiddenContainer)
+
       // 生成并下载 zip 文件
       const zipBlob = await zip.generateAsync({ type: 'blob' })
       const url = URL.createObjectURL(zipBlob)
@@ -346,9 +576,6 @@ export default function XiaohongshuCard({ content, isOpen, onClose, theme }: Xia
       link.href = url
       link.click()
       URL.revokeObjectURL(url)
-
-      // 恢复到原来的页面
-      setCurrentPage(originalPage)
     } catch (error) {
       console.error('导出图片失败:', error)
     } finally {

@@ -10,7 +10,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: true
+      webSecurity: false  // 允许加载本地文件和跨域资源
     },
     frame: true,
     backgroundColor: '#1e1e1e'
