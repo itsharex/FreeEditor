@@ -775,13 +775,13 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
     // 使用自定义的独立样式
     return `<section style="${sectionStyle}">
 ${html.replace(
-      /<h1>/g, `<h1 style="${adjustStyleForTheme(customStyles.h1).replace(/font-size: \d+px/, `font-size: ${h1Size}px`)}">`
+      /<h1([^>]*)>/g, `<h1$1 style="${adjustStyleForTheme(customStyles.h1).replace(/font-size: \d+px/, `font-size: ${h1Size}px`)}">`
     ).replace(
-      /<h2>/g, `<h2 style="${adjustStyleForTheme(customStyles.h2).replace(/font-size: \d+px/, `font-size: ${h2Size}px`)}">`
+      /<h2([^>]*)>/g, `<h2$1 style="${adjustStyleForTheme(customStyles.h2).replace(/font-size: \d+px/, `font-size: ${h2Size}px`)}">`
     ).replace(
-      /<h3>/g, `<h3 style="${adjustStyleForTheme(customStyles.h3).replace(/font-size: \d+px/, `font-size: ${h3Size}px`)}">`
+      /<h3([^>]*)>/g, `<h3$1 style="${adjustStyleForTheme(customStyles.h3).replace(/font-size: \d+px/, `font-size: ${h3Size}px`)}">`
     ).replace(
-      /<h4>/g, `<h4 style="${adjustStyleForTheme(defaultStyles.h4).replace(/font-size: \d+px/, `font-size: ${h4Size}px`)}">`
+      /<h4([^>]*)>/g, `<h4$1 style="${adjustStyleForTheme(defaultStyles.h4).replace(/font-size: \d+px/, `font-size: ${h4Size}px`)}">`
     ).replace(
       /<p>/g,
       function (match, offset, string) {
