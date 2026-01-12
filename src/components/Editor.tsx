@@ -13,6 +13,8 @@ interface EditorProps {
   onToggleOutline?: () => void
   showPreview?: boolean
   onTogglePreview?: () => void
+  syncScrollEnabled?: boolean
+  onCursorLineChange?: (line: number) => void
 }
 
 interface ToolbarPosition {
@@ -24,7 +26,7 @@ export interface EditorRef {
   scrollToLine: (lineNumber: number) => void
 }
 
-const Editor = forwardRef<EditorRef, EditorProps>(({ file, onContentChange, onNameChange, theme = 'dark', showOutline = true, onToggleOutline, showPreview = true, onTogglePreview }, ref) => {
+const Editor = forwardRef<EditorRef, EditorProps>(({ file, onContentChange, onNameChange, theme = 'dark', showOutline = true, onToggleOutline, showPreview = true, onTogglePreview, syncScrollEnabled = true, onCursorLineChange }, ref) => {
   const [name, setName] = useState('')
   const [content, setContent] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -79,6 +81,20 @@ const Editor = forwardRef<EditorRef, EditorProps>(({ file, onContentChange, onNa
     const words = chineseChars + englishWords
 
     return { lines, words, chars }
+  }
+
+  // 计算当前光标所在行并通知父组件
+  const updateCursorLine = () => {
+    if (!syncScrollEnabled || !onCursorLineChange) return
+
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const cursorPosition = textarea.selectionStart
+    const textBeforeCursor = content.substring(0, cursorPosition)
+    const currentLine = textBeforeCursor.split('\n').length - 1
+
+    onCursorLineChange(currentLine)
   }
 
   useEffect(() => {
@@ -478,6 +494,8 @@ const Editor = forwardRef<EditorRef, EditorProps>(({ file, onContentChange, onNa
         onChange={handleContentChange}
         onSelect={handleSelect}
         onKeyDown={handleKeyDown}
+        onKeyUp={updateCursorLine}
+        onClick={updateCursorLine}
         onPaste={handlePaste}
         onDrop={handleDrop}
         onDragOver={handleDragOver}

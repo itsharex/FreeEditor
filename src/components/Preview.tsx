@@ -29,6 +29,8 @@ interface PreviewProps {
   onStyleTemplatesChange?: (templates: StyleTemplate[]) => void
   showPreview?: boolean
   onXiaohongshuCard?: () => void
+  syncScrollEnabled?: boolean
+  editorScrollLine?: number
 }
 
 interface CustomStyles {
@@ -76,7 +78,7 @@ const gradientPresets = [
   { id: 8, name: '暖橙红', gradient: 'linear-gradient(135deg, #ff6a00 0%, #ee0979 100%)' },
 ]
 
-export default function Preview({ content, theme = 'dark', onStyleTemplatesChange, showPreview = true, onXiaohongshuCard }: PreviewProps) {
+export default function Preview({ content, theme = 'dark', onStyleTemplatesChange, showPreview = true, onXiaohongshuCard, syncScrollEnabled = true, editorScrollLine = 0 }: PreviewProps) {
   const [isMobileView, setIsMobileView] = useState(false)
   const [htmlContent, setHtmlContent] = useState('')
   const [showStylePanel, setShowStylePanel] = useState(false)
@@ -428,6 +430,39 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
   useEffect(() => {
     let html = content ? marked.parse(content) as string : ''
 
+    // 解析源码中的标题行号，用于同步滚动
+    const headingLineMap = new Map<string, number>()
+    if (content) {
+      const lines = content.split('\n')
+      lines.forEach((line, index) => {
+        // 匹配 markdown 标题 (# ## ### 等)
+        const headingMatch = line.match(/^(#{1,6})\s+(.+)$/)
+        if (headingMatch) {
+          const level = headingMatch[1].length
+          const text = headingMatch[2].trim()
+          // 用 level + text 作为唯一标识
+          const key = `h${level}:${text}`
+          if (!headingLineMap.has(key)) {
+            headingLineMap.set(key, index)
+          }
+        }
+      })
+    }
+
+    // 为 HTML 中的标题添加 data-source-line 属性
+    const headingCounts = new Map<string, number>()
+    html = html.replace(/<h([1-6])>([^<]*)<\/h\1>/g, (match, level, text) => {
+      const key = `h${level}:${text.trim()}`
+      const count = headingCounts.get(key) || 0
+      headingCounts.set(key, count + 1)
+
+      const lineNumber = headingLineMap.get(key)
+      if (lineNumber !== undefined) {
+        return `<h${level} data-source-line="${lineNumber}">${text}</h${level}>`
+      }
+      return match
+    })
+
     // 处理数学公式
     // 1. 处理块级公式 $$...$$
     html = html.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
@@ -540,6 +575,106 @@ export default function Preview({ content, theme = 'dark', onStyleTemplatesChang
       previewContainer.removeEventListener('click', handleImageClick)
     }
   }, [htmlContent, isCardMode, isMobileView]) // 当内容或预览模式变化时重新绑定事件
+
+  // 同步滚动：根据编辑器光标行号滚动预览区到对应位置
+  useEffect(() => {
+    if (!syncScrollEnabled || !content || isCardMode) return
+
+    // 获取当前预览容器
+    const previewContainer = isMobileView
+      ? previewContentRef.current?.querySelector('.phone-content')
+      : previewContentRef.current?.querySelector('.preview-container')
+
+    if (!previewContainer) return
+
+    // 找到所有带有 data-source-line 属性的元素
+    const elementsWithLine = Array.from(previewContainer.querySelectorAll('[data-source-line]'))
+    const totalLines = content.split('\n').length
+
+    if (elementsWithLine.length === 0) {
+      // 如果没有标题元素，回退到百分比方式
+      if (totalLines <= 1) return
+
+      const scrollPercentage = editorScrollLine / (totalLines - 1)
+      const scrollHeight = previewContainer.scrollHeight
+      const clientHeight = previewContainer.clientHeight
+      const maxScroll = scrollHeight - clientHeight
+
+      if (maxScroll > 0) {
+        const targetScrollTop = scrollPercentage * maxScroll
+        previewContainer.scrollTop = Math.max(0, Math.min(targetScrollTop, maxScroll))
+      }
+      return
+    }
+
+    // 构建行号和元素的映射，并按行号排序
+    const lineElements = elementsWithLine
+      .map(el => ({
+        element: el,
+        line: parseInt(el.getAttribute('data-source-line') || '-1', 10)
+      }))
+      .filter(item => item.line >= 0)
+      .sort((a, b) => a.line - b.line)
+
+    if (lineElements.length === 0) return
+
+    // 如果在第一个标题之前
+    if (editorScrollLine < lineElements[0].line) {
+      const firstElement = lineElements[0].element
+      const containerRect = previewContainer.getBoundingClientRect()
+      const elementRect = firstElement.getBoundingClientRect()
+      const elementTop = elementRect.top - containerRect.top + previewContainer.scrollTop
+
+      // 在第一个标题之前，按比例插值
+      const ratio = lineElements[0].line > 0 ? editorScrollLine / lineElements[0].line : 0
+      const scrollTarget = Math.max(0, elementTop * ratio - 20)
+      previewContainer.scrollTop = scrollTarget
+      return
+    }
+
+    // 找到当前行所在的区间 [prevElement, nextElement]
+    let prevItem = lineElements[0]
+    let nextItem: typeof lineElements[0] | null = null
+
+    for (let i = 0; i < lineElements.length; i++) {
+      if (lineElements[i].line <= editorScrollLine) {
+        prevItem = lineElements[i]
+        nextItem = lineElements[i + 1] || null
+      } else {
+        break
+      }
+    }
+
+    const containerRect = previewContainer.getBoundingClientRect()
+    const prevRect = prevItem.element.getBoundingClientRect()
+    const prevTop = prevRect.top - containerRect.top + previewContainer.scrollTop
+
+    if (nextItem) {
+      // 在两个标题之间，使用插值
+      const nextRect = nextItem.element.getBoundingClientRect()
+      const nextTop = nextRect.top - containerRect.top + previewContainer.scrollTop
+
+      const lineRange = nextItem.line - prevItem.line
+      const lineOffset = editorScrollLine - prevItem.line
+      const ratio = lineRange > 0 ? lineOffset / lineRange : 0
+
+      const scrollTarget = prevTop + (nextTop - prevTop) * ratio - 20
+      previewContainer.scrollTop = Math.max(0, scrollTarget)
+    } else {
+      // 在最后一个标题之后，按比例插值到底部
+      const remainingLines = totalLines - 1 - prevItem.line
+      const lineOffset = editorScrollLine - prevItem.line
+
+      if (remainingLines > 0) {
+        const maxScroll = previewContainer.scrollHeight - previewContainer.clientHeight
+        const ratio = lineOffset / remainingLines
+        const scrollTarget = prevTop + (maxScroll - prevTop) * ratio
+        previewContainer.scrollTop = Math.max(0, scrollTarget)
+      } else {
+        previewContainer.scrollTop = Math.max(0, prevTop - 20)
+      }
+    }
+  }, [editorScrollLine, syncScrollEnabled, content, isMobileView, isCardMode, htmlContent])
 
   // 将样式应用到HTML用于预览显示
   const getStyledHtml = (): string => {

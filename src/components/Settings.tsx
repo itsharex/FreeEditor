@@ -11,6 +11,8 @@ interface SettingsProps {
   files: FileItem[]
   folders: FolderItem[]
   onSyncComplete: (files: FileItem[], folders: FolderItem[]) => void
+  syncScrollEnabled: boolean
+  onSyncScrollEnabledChange: (enabled: boolean) => void
 }
 
 interface OSSConfig {
@@ -25,7 +27,7 @@ interface SyncConfig {
   interval: number // 分钟
 }
 
-export default function Settings({ isOpen, onClose, theme, files, folders, onSyncComplete }: SettingsProps) {
+export default function Settings({ isOpen, onClose, theme, files, folders, onSyncComplete, syncScrollEnabled, onSyncScrollEnabledChange }: SettingsProps) {
   const [syncStatus, setSyncStatus] = useState<string>('')
   const [isSyncing, setIsSyncing] = useState(false)
   const [isRecovering, setIsRecovering] = useState(false)
@@ -333,6 +335,36 @@ export default function Settings({ isOpen, onClose, theme, files, folders, onSyn
                 • 或直接拖拽图片文件到编辑器<br />
                 • 图片会自动上传到 OSS 并插入 Markdown 链接<br />
                 • 存储路径：freeeditor/YYYYMMDD/timestamp-random.ext
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-section" style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #3e3e42' }}>
+            <h3>编辑器设置</h3>
+            <p className="settings-description">
+              自定义编辑器的行为和交互方式。
+            </p>
+
+            <div className="form-group" style={{ marginTop: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={syncScrollEnabled}
+                  onChange={(e) => {
+                    onSyncScrollEnabledChange(e.target.checked)
+                    showToast(e.target.checked ? '已开启同步滚动' : '已关闭同步滚动')
+                  }}
+                  style={{ width: 'auto', cursor: 'pointer' }}
+                />
+                <span>编辑时预览区自动滚动</span>
+              </label>
+            </div>
+
+            <div className="settings-help">
+              <p style={{ marginTop: '12px', fontSize: '13px', color: '#858585', lineHeight: '1.6' }}>
+                💡 说明：<br />
+                • 开启后，编辑区的光标位置变化时，预览区会自动滚动到对应位置<br />
+                • 方便实时查看编辑内容的预览效果
               </p>
             </div>
           </div>

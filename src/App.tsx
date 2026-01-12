@@ -30,6 +30,9 @@ function App() {
   const [showOutline, setShowOutline] = useState(false)
   const [showPreview, setShowPreview] = useState(true)
   const [showXiaohongshuCard, setShowXiaohongshuCard] = useState(false)
+  const [editorScrollLine, setEditorScrollLine] = useState<number>(0)
+
+  const [syncScrollEnabled, setSyncScrollEnabled] = useLocalStorage<boolean>('syncScrollEnabled', false)
 
   const [autoSyncConfig] = useLocalStorage<{ enabled: boolean, interval: number }>('autoSyncConfig', {
     enabled: false,
@@ -352,6 +355,8 @@ function App() {
           onToggleOutline={() => setShowOutline(!showOutline)}
           showPreview={showPreview}
           onTogglePreview={() => setShowPreview(!showPreview)}
+          syncScrollEnabled={syncScrollEnabled}
+          onCursorLineChange={setEditorScrollLine}
         />
         <Preview
           content={currentFile?.content || ''}
@@ -359,6 +364,8 @@ function App() {
           onStyleTemplatesChange={setStyleTemplates}
           showPreview={showPreview}
           onXiaohongshuCard={() => setShowXiaohongshuCard(true)}
+          syncScrollEnabled={syncScrollEnabled}
+          editorScrollLine={editorScrollLine}
         />
       </div>
       <Modal
@@ -375,6 +382,8 @@ function App() {
         files={files}
         folders={folders}
         onSyncComplete={handleSyncComplete}
+        syncScrollEnabled={syncScrollEnabled}
+        onSyncScrollEnabledChange={setSyncScrollEnabled}
       />
       <XiaohongshuCard
         content={currentFile?.content || ''}
